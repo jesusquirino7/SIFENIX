@@ -1,16 +1,9 @@
 import Link from "next/link";
+import { VALORES } from "@/data/valores";
 
 export const metadata = {
   title: "Nosotros | Servicios Industriales Fenix",
 };
-
-const VALORES = [
-  "Seguridad",
-  "Compromiso",
-  "Eficiencia",
-  "Innovación",
-  "Confianza",
-];
 
 export default function NosotrosPage() {
   return (

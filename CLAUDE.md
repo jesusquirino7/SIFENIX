@@ -28,7 +28,17 @@ Assets de marca ya están en el repo (recortados y con fondo transparente a part
 
 Si el dueño comparte una versión en mejor resolución del logo o nuevas variantes (ej. sobre fondo oscuro para un futuro hero con foto industrial), reemplazar estos mismos archivos en `public/brand/` en vez de crear nombres nuevos, así no hay que tocar el código que ya los referencia.
 
-Aplicado ya en: `Header.js` (logo real + hover rojo en nav), `Footer.js` (borde superior rojo + nombre "SIFENIX"), `page.js` (hero con logo completo + botón CTA rojo), `oem/page.js` (botón de cotización rojo), `CatalogoMarca.js` (pills de categoría y flechita ↗ en rojo al hover), `nosotros/page.js` (sección "Nuestros valores": Seguridad, Compromiso, Eficiencia, Innovación, Confianza — tomados del kit de marca).
+Aplicado ya en: `Header.js` (logo real + hover rojo en nav), `Footer.js` (borde superior rojo + nombre "SIFENIX"), `page.js` (hero + secciones de Inicio, ver abajo), `oem/page.js` (botón de cotización rojo), `CatalogoMarca.js` (pills de categoría y flechita ↗ en rojo al hover), `nosotros/page.js` (sección "Nuestros valores").
+
+Los 5 valores de marca (Seguridad, Compromiso, Eficiencia, Innovación, Confianza) viven en `src/data/valores.js` (`VALORES`) porque se usan tanto en `/nosotros` como en Inicio — si cambian, editar ahí una sola vez.
+
+### Página de Inicio (`src/app/page.js`)
+Estructura actual, de arriba a abajo (decidida junto con el dueño para que Inicio no sea solo el logo y dos botones):
+1. Hero: logo completo (`logo-full.png`) + resumen corto + botones "Solicitar cotización" (rojo) y "Ver catálogo" (outline).
+2. "Marcas que representamos": tarjetas generadas automáticamente desde `marcas` en `src/data/marcas.js` (una por marca — hoy TURCK y Cognex) — si se agrega una marca nueva a ese archivo, aparece aquí solo.
+3. "Qué hacemos": 3 tarjetas fijas (`QUE_HACEMOS` en `page.js`) — Distribución de marcas, Fabricación OEM, Suministros industriales — mismo contenido que la lista de `/nosotros` pero en formato de tarjeta.
+4. "Nuestros valores": misma fila de pills que `/nosotros`, usando `VALORES` de `src/data/valores.js`.
+5. CTA final: banner oscuro (`--brand-black`) de ancho completo con el tagline, teléfono/WhatsApp y botón rojo "Contáctanos" — estilo pedido explícitamente por el dueño (como el banner del kit de marca), a diferencia del resto del sitio que es fondo claro.
 
 ## Alcance
 - Catálogo de marcas representadas + formulario de contacto/cotización.
@@ -56,7 +66,7 @@ Mientras no hay fotos reales, cada renglón del catálogo (`src/components/Catal
 ### Formulario de contacto / cotizaciones → base de datos compartida con el dashboard (Fase 04)
 Decisión (confirmada por el dueño del proyecto): el formulario de `/contacto`, al conectarse en la Fase 04, NO solo va a mandar un correo — va a **guardar cada cotización en Supabase** (Postgres gratis y hospedado), para que ese mismo backend alimente después el dashboard interno de la empresa (ver proyecto separado "parts-company-app": cotizaciones pendientes, pedidos entrantes, facturación interna, web y móvil) sin duplicar trabajo.
 
-Por qué Supabase (en vez de Vercel Postgres o Google Sheets): trae de fábrica un panel web donde el dueño puede ver/editar las cotizaciones a mano mientras el dashboard no existe, y una API REST lista para que tanto el sitio (Next.js) como el futuro dashboard (web o app móvil) lean/escriban los mismos datos sin que el dueño tenga que programar un panel de administración desde cero.
+Por qué Supabase (en vez de Vercel Postgres o Google Sheets): trae de fábrica un panel web donde el dueño puede ver/editar los registros a mano mientras el dashboard no existe, y una API REST lista para que tanto el sitio (Next.js) como el futuro dashboard (web o app móvil) lean/escriban los mismos datos sin que el dueño tenga que programar un panel de administración desde cero.
 
 **Son 3 tablas/flujos distintos** (confirmado por el dueño), todas pensadas para capturarse A MANO en la fase inicial (directo en el panel de tablas de Supabase, sin construir pantallas propias todavía) salvo la primera que además se llena sola desde el sitio. Ligar una cuenta de correo para crear cualquiera de las tres automáticamente (parseando correos entrantes) queda como mejora futura, no para la fase inicial:
 
@@ -77,7 +87,7 @@ El proyecto sigue un plan de 8 fases (00 a 07), con una validación al final de 
 00. Fundamentos y contenido base — LISTA (nombre: Servicios Industriales Fenix S.A. de C.V.; marcas: TURCK y Cognex; categorías definidas; misión/visión y contacto tomados de la presentación vieja)
 01. Entorno de desarrollo — LISTA: corre con `npm run dev`, git inicializado.
 02. Arquitectura de páginas — LISTA: Inicio, Marcas (índice + /marcas/turck + /marcas/cognex), OEM (/oem), Nosotros, Contacto. Nav en `src/components/Header.js`.
-03. Construcción de páginas base — EN PROGRESO: layout compartido (Header/Footer) y página de Marcas con catálogo por categoría ya están. Falta pulir Inicio (hero + CTA) y Contacto (formulario).
+03. Construcción de páginas base — EN PROGRESO: layout compartido (Header/Footer), página de Marcas con catálogo por categoría, e Inicio (hero + Marcas destacadas + Qué hacemos + Nuestros valores + CTA final) ya están. Falta Contacto (formulario).
 04. Contenido real y formulario funcional — SIGUIENTE: reemplazar `src/data/marcas.js` con datos/imágenes reales y conectar el formulario de contacto a Supabase (ver sección "Formulario de contacto / cotizaciones" arriba) para que guarde cada cotización en base de datos, no solo mande un correo.
 05. Dominio, hosting y HTTPS (Vercel)
 06. SEO básico y pruebas finales

@@ -1,15 +1,21 @@
 import "./globals.css";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 export const metadata = {
-  title: "Distribuidor Autorizado | Refacciones de Automatización",
+  title: "Servicios Industriales Fenix | Distribuidor Autorizado",
   description:
-    "Distribuidor autorizado de marcas de automatización industrial: catálogo por marca y cotización directa.",
+    "Servicios Industriales Fenix S.A. de C.V. — distribuidor autorizado de TURCK y Cognex, manufactura y suministros industriales.",
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="es">
-      <body>{children}</body>
+      <body className="flex min-h-screen flex-col">
+        <Header />
+        <div className="flex-1">{children}</div>
+        <Footer />
+      </body>
     </html>
   );
 }

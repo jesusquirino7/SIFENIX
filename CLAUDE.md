@@ -38,15 +38,16 @@ Decisión (confirmada por el dueño del proyecto): el formulario de `/contacto`,
 
 Por qué Supabase (en vez de Vercel Postgres o Google Sheets): trae de fábrica un panel web donde el dueño puede ver/editar las cotizaciones a mano mientras el dashboard no existe, y una API REST lista para que tanto el sitio (Next.js) como el futuro dashboard (web o app móvil) lean/escriban los mismos datos sin que el dueño tenga que programar un panel de administración desde cero.
 
-Tabla sugerida `cotizaciones` (ajustar campos exactos al armar el formulario en Fase 04):
-- `id`, `creado_en` (timestamp)
-- `nombre`, `empresa` (opcional), `correo`, `telefono`
-- `interes` (TURCK / Cognex / OEM / Suministros / otro)
-- `mensaje`
-- `origen` (`"sitio web"` cuando la crea el formulario, `"manual"` cuando la captura el dueño a mano — ver siguiente nota)
-- `estatus` (default `"nueva"` — pensado para que el dashboard después la mueva a atendida/cerrada)
+**Son 3 tablas/flujos distintos** (confirmado por el dueño), todas pensadas para capturarse A MANO en la fase inicial (directo en el panel de tablas de Supabase, sin construir pantallas propias todavía) salvo la primera que además se llena sola desde el sitio. Ligar una cuenta de correo para crear cualquiera de las tres automáticamente (parseando correos entrantes) queda como mejora futura, no para la fase inicial:
 
-**Captura manual en la fase inicial:** además de las cotizaciones que caigan solas desde el formulario del sitio, el dueño va a capturar A MANO (directo en el panel de tablas de Supabase, sin necesidad de construir una pantalla propia todavía) las cotizaciones que le lleguen por otros medios (teléfono, WhatsApp, en persona), y también las **solicitudes de compra a proveedores** (pedidos/materiales entrantes — la otra pata del dashboard) en una segunda tabla `solicitudes_compra` (`id`, `creado_en`, `proveedor`, `descripcion`/materiales, `numero_pedido` opcional, `fecha_esperada` opcional, `estatus`). Automatizar la creación de cualquiera de las dos a partir de un correo (ligando una cuenta de correo para parsear cotizaciones o confirmaciones de pedido entrantes) queda como mejora futura, no para la fase inicial.
+1. `cotizaciones` — **solicitudes de cotización de nuestros clientes.** Se crean solas cuando alguien manda el formulario de `/contacto` del sitio, y también se pueden capturar a mano (cotizaciones que lleguen por teléfono, WhatsApp o en persona).
+   - `id`, `creado_en`, `nombre`, `empresa` (opcional), `correo`, `telefono`, `interes` (TURCK / Cognex / OEM / Suministros / otro), `mensaje`, `origen` (`"sitio web"` / `"manual"`), `estatus` (default `"nueva"`)
+
+2. `ordenes_compra_clientes` — **órdenes de compra de nuestros clientes** (cuando una cotización se convierte en venta confirmada). Captura manual en la fase inicial.
+   - `id`, `creado_en`, `cliente`, `cotizacion_id` (opcional, liga a la cotización de origen), `descripcion`/materiales, `monto` (opcional), `estatus` (ej. `"confirmada"` / `"en proceso"` / `"entregada"`)
+
+3. `compras_proveedores` — **seguimiento de nuestras compras a nuestros proveedores** (TURCK, Cognex, etc. — pedidos/materiales entrantes para reabastecer inventario). Captura manual en la fase inicial.
+   - `id`, `creado_en`, `proveedor`, `numero_pedido` (opcional), `descripcion`/materiales, `fecha_esperada` (opcional), `estatus` (ej. `"pedido"` / `"en tránsito"` / `"recibido"`)
 
 Pendiente antes de poder implementar esto: el dueño necesita crear una cuenta y proyecto gratis en supabase.com y compartir la URL + anon key del proyecto (se guardan como variables de entorno en Vercel, nunca en el código). Esto se hace al arrancar la Fase 04, no antes.
 

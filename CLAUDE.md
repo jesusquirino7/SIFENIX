@@ -43,7 +43,10 @@ Tabla sugerida `cotizaciones` (ajustar campos exactos al armar el formulario en 
 - `nombre`, `empresa` (opcional), `correo`, `telefono`
 - `interes` (TURCK / Cognex / OEM / Suministros / otro)
 - `mensaje`
+- `origen` (`"sitio web"` cuando la crea el formulario, `"manual"` cuando la captura el dueño a mano — ver siguiente nota)
 - `estatus` (default `"nueva"` — pensado para que el dashboard después la mueva a atendida/cerrada)
+
+**Captura manual en la fase inicial:** además de las cotizaciones que caigan solas desde el formulario del sitio, el dueño va a capturar A MANO (directo en el panel de tablas de Supabase, sin necesidad de construir una pantalla propia todavía) las cotizaciones que le lleguen por otros medios (teléfono, WhatsApp, en persona), y también las **solicitudes de compra a proveedores** (pedidos/materiales entrantes — la otra pata del dashboard) en una segunda tabla `solicitudes_compra` (`id`, `creado_en`, `proveedor`, `descripcion`/materiales, `numero_pedido` opcional, `fecha_esperada` opcional, `estatus`). Automatizar la creación de cualquiera de las dos a partir de un correo (ligando una cuenta de correo para parsear cotizaciones o confirmaciones de pedido entrantes) queda como mejora futura, no para la fase inicial.
 
 Pendiente antes de poder implementar esto: el dueño necesita crear una cuenta y proyecto gratis en supabase.com y compartir la URL + anon key del proyecto (se guardan como variables de entorno en Vercel, nunca en el código). Esto se hace al arrancar la Fase 04, no antes.
 

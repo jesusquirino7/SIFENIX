@@ -6,6 +6,8 @@ Misión: brindar soluciones de manufactura y suministro. Visión: establecer rel
 
 Además de la distribución, la empresa ofrece fabricación OEM de cables/arneses a la medida (para sensores, termopares, gabinetes, motores, etc. — ver `src/app/oem/page.js`) para sectores mecánico, automotriz, médico, HVAC y otros; y suministros industriales (consumibles, refacciones, inventario de seguridad). El bloque de "Manufactura" (maquinado, estructuras metálicas, soldadura) de la presentación vieja se quitó a propósito — el enfoque del sitio es OEM, no manufactura general.
 
+`/oem` también incluye una sección "Manufactura TURCK cerca de nosotros" con datos reales (verificados por búsqueda web, fuentes: Zócalo, Somos Industria, Mexico Industry, directorios industriales) sobre la planta que TURCK opera en Arteaga/Saltillo, Coahuila (conocida como "Mirus"): fabrica conectividad (cordsets, receptáculos, módulos de E/S), +900 empleados, +175,000 ft², 96% de exportación, entrega típica de 10 días. Se presenta explícitamente como información de la planta de TURCK (no de nuestra fabricación propia) y la relación se describe como "distribuidores autorizados de TURCK" en general — sin afirmar una relación de distribución específica con esa planta, por decisión explícita del dueño del proyecto.
+
 Contacto actual (de la marca anterior, revisar si cambia con el rebrand a Fenix): tel. 899-332-3720, correo ventas@sireyes.com, WhatsApp 899-873-4596 (Juan Carlos González).
 
 ## Alcance

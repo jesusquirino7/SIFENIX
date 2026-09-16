@@ -14,6 +14,13 @@ const QUE_FABRICAMOS = [
 
 const SECTORES = ["Mecánico", "Automotriz", "Médico", "HVAC", "y otros"];
 
+const DATOS_PLANTA_TURCK = [
+  { valor: "+900", etiqueta: "empleados" },
+  { valor: "+175,000 ft²", etiqueta: "de planta" },
+  { valor: "10 días", etiqueta: "de entrega típica" },
+  { valor: "96%", etiqueta: "de la producción se exporta" },
+];
+
 export default function OemPage() {
   return (
     <main className="mx-auto max-w-5xl px-6 py-16">
@@ -55,6 +62,41 @@ export default function OemPage() {
             </span>
           ))}
         </div>
+      </div>
+
+      <div className="mt-10">
+        <h2 className="text-xl font-semibold tracking-tight">
+          Manufactura TURCK cerca de nosotros
+        </h2>
+        <p className="mt-2 max-w-2xl text-sm text-neutral-600">
+          Como distribuidores autorizados de TURCK, vale la pena mencionar
+          que buena parte de los productos de conectividad de la marca que
+          representamos — cordsets, receptáculos y módulos de E/S — se
+          fabrican en Norteamérica, en la planta que TURCK opera en Arteaga,
+          dentro de la zona metropolitana de Saltillo, Coahuila (conocida
+          internamente como &ldquo;Mirus&rdquo;). El proceso típico ahí es
+          diseño y prototipo en EE. UU., seguido de validación, manufactura y
+          control de calidad en esa planta antes del embarque.
+        </p>
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {DATOS_PLANTA_TURCK.map((dato) => (
+            <div
+              key={dato.etiqueta}
+              className="rounded-lg border border-neutral-200 px-4 py-3 text-center"
+            >
+              <p className="text-lg font-semibold tracking-tight">
+                {dato.valor}
+              </p>
+              <p className="text-xs text-neutral-500">{dato.etiqueta}</p>
+            </div>
+          ))}
+        </div>
+        <p className="mt-3 text-xs text-neutral-400">
+          Esta planta es de TURCK, no nuestra — la mencionamos como
+          referencia de la manufactura que respalda a la marca que
+          distribuimos, no como parte de nuestra fabricación OEM propia
+          descrita arriba.
+        </p>
       </div>
 
       <div className="mt-10 rounded-lg border border-neutral-200 p-5">

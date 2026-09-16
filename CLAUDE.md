@@ -33,6 +33,20 @@ Nota: no todos los productos de ejemplo tienen una subcategoría exacta en turck
 ### Imágenes de producto
 Mientras no hay fotos reales, cada renglón del catálogo (`src/components/CatalogoMarca.js` → `ProductThumb`) muestra un ícono genérico por categoría (`src/components/CategoryIcon.js`) en vez de una imagen. Para poner una foto real: 1) coloca el archivo en `public/images/marcas/<marca>/<archivo>.jpg`, 2) agrega `imagen: "/images/marcas/<marca>/<archivo>.jpg"` al producto correspondiente en `src/data/marcas.js` — no hay que tocar el componente. NO usar hotlinking a imágenes de turck.com o cognex.com (URLs frágiles, riesgo de bloqueo); las fotos reales deben descargarse del kit de distribuidor y alojarse en este proyecto.
 
+### Formulario de contacto / cotizaciones → base de datos compartida con el dashboard (Fase 04)
+Decisión (confirmada por el dueño del proyecto): el formulario de `/contacto`, al conectarse en la Fase 04, NO solo va a mandar un correo — va a **guardar cada cotización en Supabase** (Postgres gratis y hospedado), para que ese mismo backend alimente después el dashboard interno de la empresa (ver proyecto separado "parts-company-app": cotizaciones pendientes, pedidos entrantes, facturación interna, web y móvil) sin duplicar trabajo.
+
+Por qué Supabase (en vez de Vercel Postgres o Google Sheets): trae de fábrica un panel web donde el dueño puede ver/editar las cotizaciones a mano mientras el dashboard no existe, y una API REST lista para que tanto el sitio (Next.js) como el futuro dashboard (web o app móvil) lean/escriban los mismos datos sin que el dueño tenga que programar un panel de administración desde cero.
+
+Tabla sugerida `cotizaciones` (ajustar campos exactos al armar el formulario en Fase 04):
+- `id`, `creado_en` (timestamp)
+- `nombre`, `empresa` (opcional), `correo`, `telefono`
+- `interes` (TURCK / Cognex / OEM / Suministros / otro)
+- `mensaje`
+- `estatus` (default `"nueva"` — pensado para que el dashboard después la mueva a atendida/cerrada)
+
+Pendiente antes de poder implementar esto: el dueño necesita crear una cuenta y proyecto gratis en supabase.com y compartir la URL + anon key del proyecto (se guardan como variables de entorno en Vercel, nunca en el código). Esto se hace al arrancar la Fase 04, no antes.
+
 ## Plan de lanzamiento
 El proyecto sigue un plan de 8 fases (00 a 07), con una validación al final de cada una antes de avanzar a la siguiente:
 
@@ -40,7 +54,7 @@ El proyecto sigue un plan de 8 fases (00 a 07), con una validación al final de 
 01. Entorno de desarrollo — LISTA: corre con `npm run dev`, git inicializado.
 02. Arquitectura de páginas — LISTA: Inicio, Marcas (índice + /marcas/turck + /marcas/cognex), OEM (/oem), Nosotros, Contacto. Nav en `src/components/Header.js`.
 03. Construcción de páginas base — EN PROGRESO: layout compartido (Header/Footer) y página de Marcas con catálogo por categoría ya están. Falta pulir Inicio (hero + CTA) y Contacto (formulario).
-04. Contenido real y formulario funcional — SIGUIENTE: reemplazar `src/data/marcas.js` con datos/imágenes reales y conectar el formulario de contacto.
+04. Contenido real y formulario funcional — SIGUIENTE: reemplazar `src/data/marcas.js` con datos/imágenes reales y conectar el formulario de contacto a Supabase (ver sección "Formulario de contacto / cotizaciones" arriba) para que guarde cada cotización en base de datos, no solo mande un correo.
 05. Dominio, hosting y HTTPS (Vercel)
 06. SEO básico y pruebas finales
 07. Lanzamiento y seguimiento

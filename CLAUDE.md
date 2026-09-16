@@ -10,6 +10,26 @@ Además de la distribución, la empresa ofrece fabricación OEM de cables/arnese
 
 Contacto actual (de la marca anterior, revisar si cambia con el rebrand a Fenix): tel. 899-332-3720, correo ventas@sireyes.com, WhatsApp 899-873-4596 (Juan Carlos González).
 
+## Identidad visual (marca "SIFENIX")
+El dueño compartió el kit de marca ya terminado: el nombre comercial/logo es **SIFENIX** (wordmark "SI" en negro + "FENIX" en rojo, con un ícono de fénix/ave en rojo-naranja a la izquierda), con "Servicios Industriales S.A. de C.V." como subtítulo y el tagline **"Soluciones que impulsan tu industria"**. El nombre legal completo sigue siendo Servicios Industriales Fenix S.A. de C.V. (se usan los dos: "SIFENIX" como marca/logo, el nombre legal completo en copy formal como el footer).
+
+Paleta de colores (definida como variables CSS en `src/app/globals.css`, usar `var(--brand-rojo)` etc. o las clases arbitrarias de Tailwind `bg-[var(--brand-red)]`):
+- `--brand-red: #D71920` (rojo principal — acentos, botones, links activos)
+- `--brand-orange: #FF5A3C` (naranja secundario — degradado del ícono, poco usado directo en UI por ahora)
+- `--brand-black: #1F1F1F`
+- `--brand-gray: #D9D9D9`
+
+Assets de marca ya están en el repo (recortados y con fondo transparente a partir del kit que compartió el dueño):
+- `public/brand/logo-horizontal-color.png` — logo horizontal a color, usado en `Header.js`
+- `public/brand/logo-horizontal-black.png` — variante en negro (para fondos claros donde no se quiera usar rojo)
+- `public/brand/logo-full.png` — logo apilado completo (ícono + wordmark + subtítulo + tagline), usado en el hero de `page.js`
+- `public/brand/icon-mark.png` — solo el ícono del fénix, fondo transparente
+- `src/app/icon.png` — favicon/app icon (usa la convención de Next.js App Router: cualquier archivo `icon.png` dentro de `src/app/` se sirve automáticamente como favicon, no hace falta configurarlo en `layout.js`)
+
+Si el dueño comparte una versión en mejor resolución del logo o nuevas variantes (ej. sobre fondo oscuro para un futuro hero con foto industrial), reemplazar estos mismos archivos en `public/brand/` en vez de crear nombres nuevos, así no hay que tocar el código que ya los referencia.
+
+Aplicado ya en: `Header.js` (logo real + hover rojo en nav), `Footer.js` (borde superior rojo + nombre "SIFENIX"), `page.js` (hero con logo completo + botón CTA rojo), `oem/page.js` (botón de cotización rojo), `CatalogoMarca.js` (pills de categoría y flechita ↗ en rojo al hover), `nosotros/page.js` (sección "Nuestros valores": Seguridad, Compromiso, Eficiencia, Innovación, Confianza — tomados del kit de marca).
+
 ## Alcance
 - Catálogo de marcas representadas + formulario de contacto/cotización.
 - Sin carrito de compras / e-commerce.

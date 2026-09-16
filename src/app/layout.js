@@ -3,9 +3,9 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 export const metadata = {
-  title: "Servicios Industriales Fenix | Distribuidor Autorizado",
+  title: "SIFENIX | Servicios Industriales Fenix — Distribuidor Autorizado",
   description:
-    "Servicios Industriales Fenix S.A. de C.V. — distribuidor autorizado de TURCK y Cognex, manufactura y suministros industriales.",
+    "SIFENIX — Servicios Industriales Fenix S.A. de C.V. — distribuidor autorizado de TURCK y Cognex, fabricación OEM y suministros industriales.",
 };
 
 export default function RootLayout({ children }) {

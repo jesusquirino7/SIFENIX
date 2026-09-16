@@ -106,7 +106,7 @@ export default function OemPage() {
         </p>
         <Link
           href="/contacto"
-          className="mt-3 inline-block text-sm font-medium underline underline-offset-2"
+          className="mt-3 inline-block rounded-md bg-[var(--brand-red)] px-4 py-2 text-sm font-semibold text-white transition-colors hover:opacity-90"
         >
           Solicitar cotización →
         </Link>

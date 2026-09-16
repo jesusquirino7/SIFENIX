@@ -34,7 +34,7 @@ export default function CatalogoMarca({ marca }) {
           <a
             key={categoria.id}
             href={`#${categoria.id}`}
-            className="rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-600 hover:bg-neutral-200"
+            className="rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-600 hover:bg-[var(--brand-red)] hover:text-white"
           >
             {categoria.nombre} · {categoria.productos.length}
           </a>
@@ -71,10 +71,10 @@ export default function CatalogoMarca({ marca }) {
                           href={enlace}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="group inline-flex items-center gap-1 text-sm font-medium hover:underline hover:decoration-neutral-400 hover:underline-offset-2"
+                          className="group inline-flex items-center gap-1 text-sm font-medium hover:text-[var(--brand-red)] hover:underline hover:decoration-[var(--brand-red)] hover:underline-offset-2"
                         >
                           {producto.nombre}
-                          <span className="text-neutral-400 opacity-0 transition-opacity group-hover:opacity-100">
+                          <span className="text-[var(--brand-red)] opacity-0 transition-opacity group-hover:opacity-100">
                             ↗
                           </span>
                         </a>

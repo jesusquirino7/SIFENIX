@@ -4,6 +4,14 @@ export const metadata = {
   title: "Nosotros | Servicios Industriales Fenix",
 };
 
+const VALORES = [
+  "Seguridad",
+  "Compromiso",
+  "Eficiencia",
+  "Innovación",
+  "Confianza",
+];
+
 export default function NosotrosPage() {
   return (
     <main className="mx-auto max-w-5xl px-6 py-16">
@@ -39,13 +47,19 @@ export default function NosotrosPage() {
         <ul className="mt-4 flex flex-col gap-2 text-neutral-600">
           <li>
             • Distribución autorizada de TURCK y Cognex —{" "}
-            <Link href="/marcas" className="underline underline-offset-2">
+            <Link
+              href="/marcas"
+              className="text-[var(--brand-red)] underline underline-offset-2"
+            >
               ver catálogo
             </Link>
           </li>
           <li>
             • Fabricación OEM de cables a la medida —{" "}
-            <Link href="/oem" className="underline underline-offset-2">
+            <Link
+              href="/oem"
+              className="text-[var(--brand-red)] underline underline-offset-2"
+            >
               ver detalles
             </Link>
           </li>
@@ -55,6 +69,22 @@ export default function NosotrosPage() {
             consumo
           </li>
         </ul>
+      </div>
+
+      <div className="mt-12">
+        <h2 className="text-xl font-semibold tracking-tight">
+          Nuestros valores
+        </h2>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {VALORES.map((valor) => (
+            <span
+              key={valor}
+              className="rounded-full border border-[var(--brand-red)] px-3 py-1 text-sm font-medium text-[var(--brand-red)]"
+            >
+              {valor}
+            </span>
+          ))}
+        </div>
       </div>
     </main>
   );

@@ -9,6 +9,8 @@ import {
   QUOTATION_STATUS,
   RFQ_STATUS,
   CUSTOMER_ORDER_STATUS,
+  SUPPLIER_ORDER_STATUS,
+  getDeliveryHealth,
 } from "@/components/app/statusColors";
 
 export default async function OportunidadDetailPage({ params }) {
@@ -21,6 +23,7 @@ export default async function OportunidadDetailPage({ params }) {
     { data: quotations },
     { data: rfqs },
     { data: orders },
+    { data: supplierOrders },
   ] = await Promise.all([
     supabase
       .from("opportunities")
@@ -45,6 +48,11 @@ export default async function OportunidadDetailPage({ params }) {
     supabase
       .from("customer_orders")
       .select("id, order_number, status, currency, customer_order_items(quantity, unit_price)")
+      .eq("opportunity_id", id)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("supplier_orders")
+      .select("id, order_number, status, currency, expected_delivery_date, suppliers(company_name), supplier_order_items(quantity, unit_cost)")
       .eq("opportunity_id", id)
       .order("created_at", { ascending: false }),
   ]);
@@ -311,10 +319,51 @@ export default async function OportunidadDetailPage({ params }) {
               Órdenes a Proveedores
             </h2>
             <div className="mt-3">
-              <EmptyState
-                title="Todavía no disponible"
-                description="Aquí van a aparecer las órdenes de compra enviadas a los proveedores en cuanto ese módulo entre en operación (Etapa 6)."
-              />
+              {!supplierOrders?.length ? (
+                <EmptyState
+                  title="Todavía no hay orden a proveedor"
+                  description="Se crea desde una RFQ respondida — entra a la RFQ arriba y da clic en 'Nueva orden a proveedor'."
+                />
+              ) : (
+                <div className="divide-y divide-neutral-100 rounded-lg border border-neutral-200 bg-white">
+                  {supplierOrders.map((order) => {
+                    const status =
+                      SUPPLIER_ORDER_STATUS[order.status] || SUPPLIER_ORDER_STATUS.confirmed;
+                    const health = getDeliveryHealth(order);
+                    const total = (order.supplier_order_items || []).reduce(
+                      (sum, item) =>
+                        sum + (item.quantity || 0) * (item.unit_cost || 0),
+                      0
+                    );
+                    return (
+                      <Link
+                        key={order.id}
+                        href={`/app/ordenes-proveedor/${order.id}`}
+                        className="flex items-center justify-between gap-3 px-4 py-3 text-sm hover:bg-neutral-50"
+                      >
+                        <span className="font-medium text-neutral-900">
+                          {order.order_number}
+                        </span>
+                        <span className="text-neutral-600">
+                          {order.suppliers?.company_name}
+                        </span>
+                        <span className="text-neutral-600">
+                          {total.toLocaleString("es-MX", {
+                            style: "currency",
+                            currency: order.currency,
+                          })}
+                        </span>
+                        <span className="flex items-center gap-2">
+                          {health && (
+                            <Badge color={health.color}>{health.label}</Badge>
+                          )}
+                          <Badge color={status.color}>{status.label}</Badge>
+                        </span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -2,24 +2,32 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import PageHeader from "@/components/app/PageHeader";
+import AttachmentsPanel from "@/components/app/AttachmentsPanel";
 import EstadoCotizacion from "./EstadoCotizacion";
 
 export default async function CotizacionDetailPage({ params }) {
   const { id } = await params;
   const supabase = await createClient();
 
-  const [{ data: quotation }, { data: items }] = await Promise.all([
-    supabase
-      .from("quotations")
-      .select("*, opportunities(id, opportunity_number, name, customers(id, company_name, email))")
-      .eq("id", id)
-      .maybeSingle(),
-    supabase
-      .from("quotation_items")
-      .select("*")
-      .eq("quotation_id", id)
-      .order("created_at", { ascending: true }),
-  ]);
+  const [{ data: quotation }, { data: items }, { data: attachments }] =
+    await Promise.all([
+      supabase
+        .from("quotations")
+        .select("*, opportunities(id, opportunity_number, name, customers(id, company_name, email))")
+        .eq("id", id)
+        .maybeSingle(),
+      supabase
+        .from("quotation_items")
+        .select("*")
+        .eq("quotation_id", id)
+        .order("created_at", { ascending: true }),
+      supabase
+        .from("attachments")
+        .select("*")
+        .eq("entity_type", "quotation")
+        .eq("entity_id", id)
+        .order("created_at", { ascending: false }),
+    ]);
 
   if (!quotation) {
     notFound();
@@ -120,6 +128,12 @@ export default async function CotizacionDetailPage({ params }) {
               <p className="mt-2 text-sm text-neutral-600">{quotation.notes}</p>
             </div>
           )}
+
+          <AttachmentsPanel
+            entityType="quotation"
+            entityId={quotation.id}
+            attachments={attachments || []}
+          />
         </div>
 
         <div className="space-y-6">

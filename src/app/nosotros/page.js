@@ -21,14 +21,20 @@ export default function NosotrosPage() {
         <div>
           <h2 className="text-lg font-semibold tracking-tight">Misión</h2>
           <p className="mt-2 text-neutral-600">
-            Brindar soluciones de manufactura y suministro.
+            Brindar soluciones integrales de manufactura y suministro para
+            la industria, combinando la distribución de marcas líderes en
+            automatización con fabricación OEM a la medida y suministros
+            industriales confiables, para que la operación de nuestros
+            clientes nunca se detenga.
           </p>
         </div>
         <div>
           <h2 className="text-lg font-semibold tracking-tight">Visión</h2>
           <p className="mt-2 text-neutral-600">
-            A través de ellas, establecer relaciones a largo plazo que nos
-            permitan crecer junto con nuestros clientes.
+            Ser el proveedor de referencia para la industria en México,
+            construyendo relaciones de largo plazo basadas en calidad,
+            cumplimiento y soporte técnico, que nos permitan crecer junto
+            con nuestros clientes.
           </p>
         </div>
       </div>

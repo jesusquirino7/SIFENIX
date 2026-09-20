@@ -49,6 +49,24 @@ const ICONS = {
       <path d="M3 20l18-16" strokeWidth="1.2" opacity="0.5" />
     </>
   ),
+  "fluidos-hidraulicos": (
+    <>
+      <path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11Z" />
+      <path d="M9.5 15a2.5 2.5 0 0 0 2.5 2.5" />
+    </>
+  ),
+  "aceites-engranajes": (
+    <>
+      <circle cx="12" cy="12" r="3" />
+      <path d="M12 3v2.5M12 18.5V21M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M3 12h2.5M18.5 12H21M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" />
+    </>
+  ),
+  "grasas-industriales": (
+    <>
+      <path d="M9 2h6v3.2c1.8.9 3 2.8 3 4.8v9a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3v-9c0-2 1.2-3.9 3-4.8V2Z" />
+      <path d="M6 12h12" />
+    </>
+  ),
 };
 
 export default function CategoryIcon({ id, className }) {

@@ -8,30 +8,38 @@ export const metadata = {
 export default function MarcasPage() {
   return (
     <main className="mx-auto max-w-5xl px-6 py-16">
-      <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+      <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
         Marcas que representamos
       </h1>
-      <p className="mt-2 max-w-2xl text-neutral-600">
+      <p className="mt-3 max-w-2xl text-base text-neutral-600 sm:text-lg">
         Distribuidor autorizado de las siguientes marcas de automatización
         industrial.
       </p>
 
-      <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2">
         {marcas.map((marca) => (
           <Link
             key={marca.slug}
             href={`/marcas/${marca.slug}`}
-            className="rounded-lg border border-neutral-200 p-6 transition hover:border-neutral-400"
+            className="rounded-lg border border-neutral-200 p-7 transition hover:border-neutral-400"
           >
-            <h2 className="text-lg font-semibold tracking-tight">
+            {marca.logo && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={marca.logo}
+                alt={marca.nombre}
+                className="h-10 w-auto object-contain"
+              />
+            )}
+            <h2 className="mt-4 text-xl font-semibold tracking-tight">
               {marca.nombre}
             </h2>
-            <p className="mt-1 text-sm text-neutral-600">{marca.resumen}</p>
-            <ul className="mt-3 flex flex-wrap gap-2">
+            <p className="mt-1 text-base text-neutral-600">{marca.resumen}</p>
+            <ul className="mt-4 flex flex-wrap gap-2">
               {marca.categorias.map((categoria) => (
                 <li
                   key={categoria.id}
-                  className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs text-neutral-600"
+                  className="rounded-full bg-neutral-100 px-3 py-1.5 text-sm text-neutral-600"
                 >
                   {categoria.nombre}
                 </li>

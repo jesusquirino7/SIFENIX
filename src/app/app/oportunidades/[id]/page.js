@@ -218,13 +218,43 @@ export default async function OportunidadDetailPage({ params }) {
           </div>
 
           <div>
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-neutral-500">
+                Comparativo de proveedores
+              </h2>
+              {rfqs?.length > 0 && (
+                <Link
+                  href={`/app/oportunidades/${opportunity.id}/comparativo`}
+                  className="text-sm font-medium text-[var(--brand-red)] hover:opacity-80"
+                >
+                  Ver comparativo →
+                </Link>
+              )}
+            </div>
+            <div className="mt-3">
+              {!rfqs?.length ? (
+                <EmptyState
+                  title="Todavía no hay nada que comparar"
+                  description="Crea al menos una RFQ arriba para empezar a capturar respuestas de proveedores."
+                />
+              ) : (
+                <p className="text-sm text-neutral-500">
+                  Compara costo y tiempo de entrega de los {rfqs.length}{" "}
+                  proveedor{rfqs.length === 1 ? "" : "es"} consultado
+                  {rfqs.length === 1 ? "" : "s"} para esta operación.
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div>
             <h2 className="text-sm font-semibold text-neutral-500">
-              Comparativo y órdenes
+              Órdenes de compra
             </h2>
             <div className="mt-3">
               <EmptyState
                 title="Todavía no disponible"
-                description="Aquí van a aparecer el comparativo de respuestas de proveedores y las órdenes de compra en cuanto esos módulos entren en operación (Etapa 4 en adelante)."
+                description="Aquí van a aparecer la orden de compra del cliente y la orden enviada al proveedor en cuanto esos módulos entren en operación (Etapa 5 en adelante)."
               />
             </div>
           </div>

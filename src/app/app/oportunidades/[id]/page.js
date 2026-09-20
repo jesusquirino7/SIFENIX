@@ -4,24 +4,30 @@ import { createClient } from "@/lib/supabase/server";
 import PageHeader from "@/components/app/PageHeader";
 import Badge from "@/components/app/Badge";
 import EmptyState from "@/components/app/EmptyState";
-import { OPPORTUNITY_STATUS } from "@/components/app/statusColors";
+import { OPPORTUNITY_STATUS, QUOTATION_STATUS } from "@/components/app/statusColors";
 
 export default async function OportunidadDetailPage({ params }) {
   const { id } = await params;
   const supabase = await createClient();
 
-  const [{ data: opportunity }, { data: items }] = await Promise.all([
-    supabase
-      .from("opportunities")
-      .select("*, customers(id, company_name, email, phone)")
-      .eq("id", id)
-      .maybeSingle(),
-    supabase
-      .from("opportunity_items")
-      .select("*")
-      .eq("opportunity_id", id)
-      .order("created_at", { ascending: true }),
-  ]);
+  const [{ data: opportunity }, { data: items }, { data: quotations }] =
+    await Promise.all([
+      supabase
+        .from("opportunities")
+        .select("*, customers(id, company_name, email, phone)")
+        .eq("id", id)
+        .maybeSingle(),
+      supabase
+        .from("opportunity_items")
+        .select("*")
+        .eq("opportunity_id", id)
+        .order("created_at", { ascending: true }),
+      supabase
+        .from("quotations")
+        .select("id, quotation_number, status, currency, quotation_items(quantity, unit_price)")
+        .eq("opportunity_id", id)
+        .order("created_at", { ascending: false }),
+    ]);
 
   if (!opportunity) {
     notFound();
@@ -112,13 +118,65 @@ export default async function OportunidadDetailPage({ params }) {
           </div>
 
           <div>
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-neutral-500">
+                Cotizaciones
+              </h2>
+              <Link
+                href={`/app/oportunidades/${opportunity.id}/cotizaciones/nueva`}
+                className="text-sm font-medium text-[var(--brand-red)] hover:opacity-80"
+              >
+                + Nueva cotización
+              </Link>
+            </div>
+            <div className="mt-3">
+              {!quotations?.length ? (
+                <EmptyState
+                  title="Todavía no hay cotizaciones para esta operación"
+                  description="Da clic en 'Nueva cotización' para generar la primera a partir de los productos solicitados."
+                />
+              ) : (
+                <div className="divide-y divide-neutral-100 rounded-lg border border-neutral-200 bg-white">
+                  {quotations.map((quotation) => {
+                    const status =
+                      QUOTATION_STATUS[quotation.status] || QUOTATION_STATUS.draft;
+                    const total = (quotation.quotation_items || []).reduce(
+                      (sum, item) =>
+                        sum + (item.quantity || 0) * (item.unit_price || 0),
+                      0
+                    );
+                    return (
+                      <Link
+                        key={quotation.id}
+                        href={`/app/cotizaciones/${quotation.id}`}
+                        className="flex items-center justify-between px-4 py-3 text-sm hover:bg-neutral-50"
+                      >
+                        <span className="font-medium text-neutral-900">
+                          {quotation.quotation_number}
+                        </span>
+                        <span className="text-neutral-600">
+                          {total.toLocaleString("es-MX", {
+                            style: "currency",
+                            currency: quotation.currency,
+                          })}
+                        </span>
+                        <Badge color={status.color}>{status.label}</Badge>
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div>
             <h2 className="text-sm font-semibold text-neutral-500">
-              Documentos relacionados
+              RFQ, comparativo y órdenes
             </h2>
             <div className="mt-3">
               <EmptyState
-                title="Todavía no hay documentos ligados a esta operación"
-                description="Aquí van a aparecer la cotización al cliente, las RFQ a proveedores, sus respuestas, el comparativo y las órdenes de compra en cuanto esos módulos entren en operación (Etapa 2 en adelante)."
+                title="Todavía no disponible"
+                description="Aquí van a aparecer las RFQ a proveedores, sus respuestas, el comparativo y las órdenes de compra en cuanto esos módulos entren en operación (Etapa 3 en adelante)."
               />
             </div>
           </div>

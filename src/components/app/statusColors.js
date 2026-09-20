@@ -21,3 +21,17 @@ export const QUOTATION_STATUS_FLOW = {
   rejected: ["draft"],
   expired: ["draft"],
 };
+
+export const RFQ_STATUS = {
+  draft: { label: "Borrador", color: "gray" },
+  sent: { label: "Enviada", color: "blue" },
+  responded: { label: "Respondida", color: "green" },
+  expired: { label: "Vencida", color: "amber" },
+};
+
+export const RFQ_STATUS_FLOW = {
+  draft: ["sent"],
+  sent: ["responded", "expired"],
+  responded: ["expired"],
+  expired: ["draft"],
+};

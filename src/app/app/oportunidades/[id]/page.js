@@ -4,13 +4,13 @@ import { createClient } from "@/lib/supabase/server";
 import PageHeader from "@/components/app/PageHeader";
 import Badge from "@/components/app/Badge";
 import EmptyState from "@/components/app/EmptyState";
-import { OPPORTUNITY_STATUS, QUOTATION_STATUS } from "@/components/app/statusColors";
+import { OPPORTUNITY_STATUS, QUOTATION_STATUS, RFQ_STATUS } from "@/components/app/statusColors";
 
 export default async function OportunidadDetailPage({ params }) {
   const { id } = await params;
   const supabase = await createClient();
 
-  const [{ data: opportunity }, { data: items }, { data: quotations }] =
+  const [{ data: opportunity }, { data: items }, { data: quotations }, { data: rfqs }] =
     await Promise.all([
       supabase
         .from("opportunities")
@@ -25,6 +25,11 @@ export default async function OportunidadDetailPage({ params }) {
       supabase
         .from("quotations")
         .select("id, quotation_number, status, currency, quotation_items(quantity, unit_price)")
+        .eq("opportunity_id", id)
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("rfqs")
+        .select("id, rfq_number, status, suppliers(company_name)")
         .eq("opportunity_id", id)
         .order("created_at", { ascending: false }),
     ]);
@@ -170,13 +175,56 @@ export default async function OportunidadDetailPage({ params }) {
           </div>
 
           <div>
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-neutral-500">
+                RFQ a proveedores
+              </h2>
+              <Link
+                href={`/app/oportunidades/${opportunity.id}/rfq/nueva`}
+                className="text-sm font-medium text-[var(--brand-red)] hover:opacity-80"
+              >
+                + Nueva RFQ
+              </Link>
+            </div>
+            <div className="mt-3">
+              {!rfqs?.length ? (
+                <EmptyState
+                  title="Todavía no hay RFQ para esta operación"
+                  description="Da clic en 'Nueva RFQ' para pedirle cotización a un proveedor a partir de los productos solicitados."
+                />
+              ) : (
+                <div className="divide-y divide-neutral-100 rounded-lg border border-neutral-200 bg-white">
+                  {rfqs.map((rfq) => {
+                    const status = RFQ_STATUS[rfq.status] || RFQ_STATUS.draft;
+                    return (
+                      <Link
+                        key={rfq.id}
+                        href={`/app/rfq-proveedores/${rfq.id}`}
+                        className="flex items-center justify-between px-4 py-3 text-sm hover:bg-neutral-50"
+                      >
+                        <span className="font-medium text-neutral-900">
+                          {rfq.rfq_number}
+                        </span>
+                        <span className="text-neutral-600">
+                          {rfq.suppliers?.company_name}
+                        </span>
+                        <Badge color={status.color}>{status.label}</Badge>
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div>
             <h2 className="text-sm font-semibold text-neutral-500">
-              RFQ, comparativo y órdenes
+              Comparativo y órdenes
             </h2>
             <div className="mt-3">
               <EmptyState
                 title="Todavía no disponible"
-                description="Aquí van a aparecer las RFQ a proveedores, sus respuestas, el comparativo y las órdenes de compra en cuanto esos módulos entren en operación (Etapa 3 en adelante)."
+                description="Aquí van a aparecer el comparativo de respuestas de proveedores y las órdenes de compra en cuanto esos módulos entren en operación (Etapa 4 en adelante)."
               />
             </div>
           </div>

@@ -4,35 +4,50 @@ import { createClient } from "@/lib/supabase/server";
 import PageHeader from "@/components/app/PageHeader";
 import Badge from "@/components/app/Badge";
 import EmptyState from "@/components/app/EmptyState";
-import { OPPORTUNITY_STATUS, QUOTATION_STATUS, RFQ_STATUS } from "@/components/app/statusColors";
+import {
+  OPPORTUNITY_STATUS,
+  QUOTATION_STATUS,
+  RFQ_STATUS,
+  CUSTOMER_ORDER_STATUS,
+} from "@/components/app/statusColors";
 
 export default async function OportunidadDetailPage({ params }) {
   const { id } = await params;
   const supabase = await createClient();
 
-  const [{ data: opportunity }, { data: items }, { data: quotations }, { data: rfqs }] =
-    await Promise.all([
-      supabase
-        .from("opportunities")
-        .select("*, customers(id, company_name, email, phone)")
-        .eq("id", id)
-        .maybeSingle(),
-      supabase
-        .from("opportunity_items")
-        .select("*")
-        .eq("opportunity_id", id)
-        .order("created_at", { ascending: true }),
-      supabase
-        .from("quotations")
-        .select("id, quotation_number, status, currency, quotation_items(quantity, unit_price)")
-        .eq("opportunity_id", id)
-        .order("created_at", { ascending: false }),
-      supabase
-        .from("rfqs")
-        .select("id, rfq_number, status, suppliers(company_name)")
-        .eq("opportunity_id", id)
-        .order("created_at", { ascending: false }),
-    ]);
+  const [
+    { data: opportunity },
+    { data: items },
+    { data: quotations },
+    { data: rfqs },
+    { data: orders },
+  ] = await Promise.all([
+    supabase
+      .from("opportunities")
+      .select("*, customers(id, company_name, email, phone)")
+      .eq("id", id)
+      .maybeSingle(),
+    supabase
+      .from("opportunity_items")
+      .select("*")
+      .eq("opportunity_id", id)
+      .order("created_at", { ascending: true }),
+    supabase
+      .from("quotations")
+      .select("id, quotation_number, status, currency, quotation_items(quantity, unit_price)")
+      .eq("opportunity_id", id)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("rfqs")
+      .select("id, rfq_number, status, suppliers(company_name)")
+      .eq("opportunity_id", id)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("customer_orders")
+      .select("id, order_number, status, currency, customer_order_items(quantity, unit_price)")
+      .eq("opportunity_id", id)
+      .order("created_at", { ascending: false }),
+  ]);
 
   if (!opportunity) {
     notFound();
@@ -249,12 +264,56 @@ export default async function OportunidadDetailPage({ params }) {
 
           <div>
             <h2 className="text-sm font-semibold text-neutral-500">
-              Órdenes de compra
+              Órdenes de Cliente
+            </h2>
+            <div className="mt-3">
+              {!orders?.length ? (
+                <EmptyState
+                  title="Todavía no hay orden de cliente"
+                  description="Se crea desde una cotización aceptada — entra a la cotización arriba y da clic en 'Nueva orden de cliente'."
+                />
+              ) : (
+                <div className="divide-y divide-neutral-100 rounded-lg border border-neutral-200 bg-white">
+                  {orders.map((order) => {
+                    const status =
+                      CUSTOMER_ORDER_STATUS[order.status] || CUSTOMER_ORDER_STATUS.confirmed;
+                    const total = (order.customer_order_items || []).reduce(
+                      (sum, item) =>
+                        sum + (item.quantity || 0) * (item.unit_price || 0),
+                      0
+                    );
+                    return (
+                      <Link
+                        key={order.id}
+                        href={`/app/ordenes-cliente/${order.id}`}
+                        className="flex items-center justify-between px-4 py-3 text-sm hover:bg-neutral-50"
+                      >
+                        <span className="font-medium text-neutral-900">
+                          {order.order_number}
+                        </span>
+                        <span className="text-neutral-600">
+                          {total.toLocaleString("es-MX", {
+                            style: "currency",
+                            currency: order.currency,
+                          })}
+                        </span>
+                        <Badge color={status.color}>{status.label}</Badge>
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div>
+            <h2 className="text-sm font-semibold text-neutral-500">
+              Órdenes a Proveedores
             </h2>
             <div className="mt-3">
               <EmptyState
                 title="Todavía no disponible"
-                description="Aquí van a aparecer la orden de compra del cliente y la orden enviada al proveedor en cuanto esos módulos entren en operación (Etapa 5 en adelante)."
+                description="Aquí van a aparecer las órdenes de compra enviadas a los proveedores en cuanto ese módulo entre en operación (Etapa 6)."
               />
             </div>
           </div>

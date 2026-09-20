@@ -35,3 +35,17 @@ export const RFQ_STATUS_FLOW = {
   responded: ["expired"],
   expired: ["draft"],
 };
+
+export const CUSTOMER_ORDER_STATUS = {
+  confirmed: { label: "Confirmada", color: "blue" },
+  in_process: { label: "En proceso", color: "amber" },
+  delivered: { label: "Entregada", color: "green" },
+  cancelled: { label: "Cancelada", color: "red" },
+};
+
+export const CUSTOMER_ORDER_STATUS_FLOW = {
+  confirmed: ["in_process", "cancelled"],
+  in_process: ["delivered", "cancelled"],
+  delivered: [],
+  cancelled: ["confirmed"],
+};

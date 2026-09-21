@@ -14,9 +14,11 @@ export default async function DashboardPage() {
     suppliersResult,
     quotationsSentResult,
     rfqsSentResult,
+    newLeadsResult,
     quotationsAwaiting,
     rfqsAwaiting,
     supplierOrdersOpen,
+    newLeads,
   ] = await Promise.all([
     supabase
       .from("opportunities")
@@ -39,6 +41,10 @@ export default async function DashboardPage() {
       .select("id", { count: "exact", head: true })
       .eq("status", "sent"),
     supabase
+      .from("leads")
+      .select("id", { count: "exact", head: true })
+      .eq("estatus", "nuevo"),
+    supabase
       .from("quotations")
       .select(
         "id, quotation_number, valid_until, opportunities(customers(company_name))"
@@ -54,11 +60,25 @@ export default async function DashboardPage() {
       .from("supplier_orders")
       .select("id, order_number, expected_delivery_date, suppliers(company_name)")
       .in("status", ["confirmed", "in_process"]),
+    supabase
+      .from("leads")
+      .select("id, nombre, empresa, created_at")
+      .eq("estatus", "nuevo")
+      .order("created_at", { ascending: true }),
   ]);
 
   const today = new Date().toISOString().slice(0, 10);
 
   const attention = [
+    ...(newLeads.data || []).map((lead) => ({
+      key: `lead-${lead.id}`,
+      href: `/app/leads/${lead.id}`,
+      title: lead.nombre,
+      subtitle: lead.empresa,
+      badge: "Solicitud sin revisar",
+      badgeColor: "blue",
+      note: new Date(lead.created_at).toLocaleDateString("es-MX"),
+    })),
     ...(quotationsAwaiting.data || []).map((q) => ({
       key: `q-${q.id}`,
       href: `/app/cotizaciones/${q.id}`,
@@ -95,6 +115,11 @@ export default async function DashboardPage() {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <StatCard
+          label="Solicitudes nuevas"
+          value={newLeadsResult.count ?? 0}
+          hint="Del formulario de contacto"
+        />
+        <StatCard
           label="Oportunidades activas"
           value={opportunitiesResult.count ?? 0}
           hint="Abiertas o en cotización"
@@ -129,7 +154,7 @@ export default async function DashboardPage() {
           {!attention.length ? (
             <EmptyState
               title="Todavía no hay nada pendiente de revisar"
-              description="Cotizaciones y RFQ enviadas esperando respuesta, y órdenes de proveedor atrasadas van a aparecer aquí."
+              description="Solicitudes nuevas del sitio, cotizaciones y RFQ enviadas esperando respuesta, y órdenes de proveedor atrasadas van a aparecer aquí."
             />
           ) : (
             <div className="divide-y divide-neutral-100 rounded-lg border border-neutral-200 bg-white">

@@ -72,6 +72,20 @@ export const SUPPLIER_ORDER_STATUS_FLOW = {
   cancelled: ["confirmed"],
 };
 
+export const LEAD_STATUS = {
+  nuevo: { label: "Nueva", color: "blue" },
+  contactado: { label: "Contactada", color: "amber" },
+  convertido: { label: "Convertida", color: "green" },
+  descartado: { label: "Descartada", color: "gray" },
+};
+
+export const LEAD_STATUS_FLOW = {
+  nuevo: ["contactado", "descartado"],
+  contactado: ["convertido", "descartado"],
+  convertido: [],
+  descartado: ["nuevo"],
+};
+
 // Indicador de "salud de entrega" para ordenes con expected_delivery_date:
 // compara la fecha esperada contra hoy (independiente del status
 // confirmada/en transito/etc.) para saber si esta atrasada, por cumplir

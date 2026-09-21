@@ -5,8 +5,9 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/components/app/ToastProvider";
 import { inputClass } from "@/components/app/formStyles";
+import MoneyInput from "@/components/app/MoneyInput";
 
-export default function RfqItemsEditor({ items: initialItems }) {
+export default function RfqItemsEditor({ items: initialItems, locked = false }) {
   const router = useRouter();
   const { showToast } = useToast();
   const [items, setItems] = useState(
@@ -83,40 +84,46 @@ export default function RfqItemsEditor({ items: initialItems }) {
               </td>
               <td className="py-2 pr-4 text-neutral-600">{item.quantity}</td>
               <td className="py-2 pr-4">
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0"
+                <MoneyInput
+                  disabled={locked}
                   value={item.supplier_unit_cost}
-                  onChange={(e) => updateItem(index, "supplier_unit_cost", e.target.value)}
-                  className={`${inputClass} mt-0 w-28`}
+                  onChange={(v) => updateItem(index, "supplier_unit_cost", v)}
+                  className={`${inputClass} mt-0 w-28 disabled:opacity-60`}
                 />
               </td>
               <td className="py-2 pr-4">
                 <input
                   type="number"
                   min="0"
+                  disabled={locked}
                   value={item.supplier_lead_time_days}
                   onChange={(e) =>
                     updateItem(index, "supplier_lead_time_days", e.target.value)
                   }
-                  className={`${inputClass} mt-0 w-24`}
+                  className={`${inputClass} mt-0 w-24 disabled:opacity-60`}
                 />
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-      <div className="mt-4 flex justify-end">
-        <button
-          type="button"
-          disabled={saving}
-          onClick={handleSave}
-          className="rounded-md bg-[var(--brand-red)] px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
-        >
-          {saving ? "Guardando…" : "Guardar respuesta del proveedor"}
-        </button>
-      </div>
+      {locked ? (
+        <p className="mt-4 text-xs text-neutral-400">
+          Ya no se puede editar — la RFQ está marcada como respondida o vencida.
+          Reábrela (botón "Marcar como borrador") si necesitas corregir algo.
+        </p>
+      ) : (
+        <div className="mt-4 flex justify-end">
+          <button
+            type="button"
+            disabled={saving}
+            onClick={handleSave}
+            className="rounded-md bg-[var(--brand-red)] px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
+          >
+            {saving ? "Guardando…" : "Guardar respuesta del proveedor"}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

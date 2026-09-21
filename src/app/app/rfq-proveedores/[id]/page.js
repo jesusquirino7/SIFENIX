@@ -61,7 +61,10 @@ export default async function RfqDetailPage({ params }) {
             <h2 className="text-sm font-semibold text-neutral-500">
               Productos solicitados
             </h2>
-            <RfqItemsEditor items={items || []} />
+            <RfqItemsEditor
+              items={items || []}
+              locked={rfq.status === "responded" || rfq.status === "expired"}
+            />
           </div>
 
           {rfq.notes && (

@@ -6,6 +6,14 @@ export const OPPORTUNITY_STATUS = {
   cancelled: { label: "Cancelada", color: "gray" },
 };
 
+export const OPPORTUNITY_STATUS_FLOW = {
+  open: ["quoting", "cancelled"],
+  quoting: ["won", "lost", "cancelled"],
+  won: [],
+  lost: ["open"],
+  cancelled: ["open"],
+};
+
 export const QUOTATION_STATUS = {
   draft: { label: "Borrador", color: "gray" },
   sent: { label: "Enviada", color: "blue" },
@@ -32,7 +40,7 @@ export const RFQ_STATUS = {
 export const RFQ_STATUS_FLOW = {
   draft: ["sent"],
   sent: ["responded", "expired"],
-  responded: ["expired"],
+  responded: ["draft", "expired"],
   expired: ["draft"],
 };
 

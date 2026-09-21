@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import PageHeader from "@/components/app/PageHeader";
 import AttachmentsPanel from "@/components/app/AttachmentsPanel";
 import EstadoOrdenCliente from "./EstadoOrdenCliente";
+import OrdenClienteEditor from "./OrdenClienteEditor";
 
 export default async function OrdenClienteDetailPage({ params }) {
   const { id } = await params;
@@ -35,11 +36,6 @@ export default async function OrdenClienteDetailPage({ params }) {
     notFound();
   }
 
-  const total = (items || []).reduce(
-    (sum, item) => sum + (item.quantity || 0) * (item.unit_price || 0),
-    0
-  );
-
   return (
     <div>
       <PageHeader
@@ -53,74 +49,11 @@ export default async function OrdenClienteDetailPage({ params }) {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
-          <div className="rounded-lg border border-neutral-200 bg-white p-6">
-            <h2 className="text-sm font-semibold text-neutral-500">
-              Productos
-            </h2>
-            {!items?.length ? (
-              <p className="mt-3 text-sm text-neutral-500">
-                Sin productos capturados.
-              </p>
-            ) : (
-              <div className="mt-3 overflow-x-auto">
-                <table className="w-full text-left text-sm">
-                  <thead className="border-b border-neutral-200 text-xs uppercase tracking-wide text-neutral-500">
-                    <tr>
-                      <th className="py-2 pr-4 font-medium">Part number</th>
-                      <th className="py-2 pr-4 font-medium">Descripción</th>
-                      <th className="py-2 pr-4 font-medium">Cant.</th>
-                      <th className="py-2 pr-4 font-medium">P. unitario</th>
-                      <th className="py-2 pr-4 font-medium">Subtotal</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-neutral-100">
-                    {items.map((item) => (
-                      <tr key={item.id}>
-                        <td className="py-2 pr-4 font-medium text-neutral-900">
-                          {item.part_number || "—"}
-                        </td>
-                        <td className="py-2 pr-4 text-neutral-600">
-                          {item.description || "—"}
-                        </td>
-                        <td className="py-2 pr-4 text-neutral-600">
-                          {item.quantity}
-                        </td>
-                        <td className="py-2 pr-4 text-neutral-600">
-                          {item.unit_price != null
-                            ? item.unit_price.toLocaleString("es-MX", {
-                                style: "currency",
-                                currency: order.currency,
-                              })
-                            : "—"}
-                        </td>
-                        <td className="py-2 pr-4 font-medium text-neutral-900">
-                          {(
-                            (item.quantity || 0) * (item.unit_price || 0)
-                          ).toLocaleString("es-MX", {
-                            style: "currency",
-                            currency: order.currency,
-                          })}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                  <tfoot>
-                    <tr>
-                      <td colSpan={4} className="pt-3 text-right font-semibold text-neutral-500">
-                        Total
-                      </td>
-                      <td className="pt-3 font-semibold text-neutral-900">
-                        {total.toLocaleString("es-MX", {
-                          style: "currency",
-                          currency: order.currency,
-                        })}
-                      </td>
-                    </tr>
-                  </tfoot>
-                </table>
-              </div>
-            )}
-          </div>
+          <OrdenClienteEditor
+            order={order}
+            items={items || []}
+            editable={order.status === "confirmed"}
+          />
 
           {order.notes && (
             <div className="rounded-lg border border-neutral-200 bg-white p-6">

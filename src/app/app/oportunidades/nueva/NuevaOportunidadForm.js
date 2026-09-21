@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/components/app/ToastProvider";
 import { inputClass, labelClass } from "@/components/app/formStyles";
+import MoneyInput from "@/components/app/MoneyInput";
 
 const EMPTY_ITEM = { part_number: "", manufacturer: "", description: "", quantity: 1 };
 
@@ -142,12 +143,9 @@ export default function NuevaOportunidadForm({ customers }) {
       <div className="grid grid-cols-3 gap-4">
         <div>
           <label className={labelClass}>Valor estimado</label>
-          <input
-            type="number"
-            step="0.01"
-            min="0"
+          <MoneyInput
             value={form.estimated_value}
-            onChange={(e) => onChange("estimated_value", e.target.value)}
+            onChange={(v) => onChange("estimated_value", v)}
             className={inputClass}
           />
         </div>

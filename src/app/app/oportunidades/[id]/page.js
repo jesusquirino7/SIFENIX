@@ -5,13 +5,14 @@ import PageHeader from "@/components/app/PageHeader";
 import Badge from "@/components/app/Badge";
 import EmptyState from "@/components/app/EmptyState";
 import {
-  OPPORTUNITY_STATUS,
   QUOTATION_STATUS,
   RFQ_STATUS,
   CUSTOMER_ORDER_STATUS,
   SUPPLIER_ORDER_STATUS,
   getDeliveryHealth,
 } from "@/components/app/statusColors";
+import EstadoOportunidad from "./EstadoOportunidad";
+import EditarOportunidadForm from "./EditarOportunidadForm";
 
 export default async function OportunidadDetailPage({ params }) {
   const { id } = await params;
@@ -61,8 +62,6 @@ export default async function OportunidadDetailPage({ params }) {
     notFound();
   }
 
-  const status = OPPORTUNITY_STATUS[opportunity.status] || OPPORTUNITY_STATUS.open;
-
   return (
     <div>
       <PageHeader
@@ -71,37 +70,17 @@ export default async function OportunidadDetailPage({ params }) {
           { label: "Oportunidades", href: "/app/oportunidades" },
           { label: opportunity.opportunity_number },
         ]}
-        action={<Badge color={status.color}>{status.label}</Badge>}
+        action={
+          <EstadoOportunidad
+            opportunityId={opportunity.id}
+            status={opportunity.status}
+          />
+        }
       />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-6">
-          <div className="rounded-lg border border-neutral-200 bg-white p-6">
-            <h2 className="text-lg font-semibold tracking-tight">
-              {opportunity.name}
-            </h2>
-            {opportunity.description && (
-              <p className="mt-2 text-sm text-neutral-600">
-                {opportunity.description}
-              </p>
-            )}
-            <dl className="mt-4 grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <dt className="text-neutral-500">Valor estimado</dt>
-                <dd className="font-medium text-neutral-900">
-                  {opportunity.estimated_value != null
-                    ? `${opportunity.estimated_value} ${opportunity.currency}`
-                    : "—"}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-neutral-500">Cierre esperado</dt>
-                <dd className="font-medium text-neutral-900">
-                  {opportunity.expected_close_date || "—"}
-                </dd>
-              </div>
-            </dl>
-          </div>
+          <EditarOportunidadForm opportunity={opportunity} />
 
           <div className="rounded-lg border border-neutral-200 bg-white p-6">
             <h2 className="text-sm font-semibold text-neutral-500">

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/components/app/ToastProvider";
 import { inputClass, labelClass } from "@/components/app/formStyles";
+import MoneyInput from "@/components/app/MoneyInput";
 
 const EMPTY_ITEM = {
   part_number: "",
@@ -197,12 +198,9 @@ export default function NuevaCotizacionForm({ opportunityId, initialItems }) {
                 placeholder="Cant."
                 className={`${inputClass} col-span-1 mt-0`}
               />
-              <input
-                type="number"
-                step="0.01"
-                min="0"
+              <MoneyInput
                 value={item.unit_price}
-                onChange={(e) => updateItem(index, "unit_price", e.target.value)}
+                onChange={(v) => updateItem(index, "unit_price", v)}
                 placeholder="Precio unit."
                 className={`${inputClass} col-span-2 mt-0`}
               />

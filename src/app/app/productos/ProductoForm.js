@@ -1,6 +1,7 @@
 "use client";
 
 import { inputClass, labelClass } from "@/components/app/formStyles";
+import MoneyInput from "@/components/app/MoneyInput";
 
 export default function ProductoForm({
   form,
@@ -66,23 +67,17 @@ export default function ProductoForm({
       <div className="grid grid-cols-3 gap-4">
         <div>
           <label className={labelClass}>Costo</label>
-          <input
-            type="number"
-            step="0.01"
-            min="0"
+          <MoneyInput
             value={form.default_cost}
-            onChange={(e) => onChange("default_cost", e.target.value)}
+            onChange={(v) => onChange("default_cost", v)}
             className={inputClass}
           />
         </div>
         <div>
           <label className={labelClass}>Precio</label>
-          <input
-            type="number"
-            step="0.01"
-            min="0"
+          <MoneyInput
             value={form.default_price}
-            onChange={(e) => onChange("default_price", e.target.value)}
+            onChange={(v) => onChange("default_price", v)}
             className={inputClass}
           />
         </div>

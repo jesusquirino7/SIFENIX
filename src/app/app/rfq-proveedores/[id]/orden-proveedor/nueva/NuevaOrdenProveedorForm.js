@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/components/app/ToastProvider";
 import { inputClass, labelClass } from "@/components/app/formStyles";
+import MoneyInput from "@/components/app/MoneyInput";
 
 function fromRfqItem(item) {
   return {
@@ -154,12 +155,9 @@ export default function NuevaOrdenProveedorForm({
                 placeholder="Cant."
                 className={`${inputClass} col-span-2 mt-0`}
               />
-              <input
-                type="number"
-                step="0.01"
-                min="0"
+              <MoneyInput
                 value={item.unit_cost}
-                onChange={(e) => updateItem(index, "unit_cost", e.target.value)}
+                onChange={(v) => updateItem(index, "unit_cost", v)}
                 placeholder="Costo unit."
                 className={`${inputClass} col-span-3 mt-0`}
               />

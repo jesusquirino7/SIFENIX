@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import PageHeader from "@/components/app/PageHeader";
 import Badge from "@/components/app/Badge";
@@ -40,12 +41,22 @@ export default async function ConfiguracionPage() {
             </dd>
           </div>
         </dl>
-        <p className="mt-6 text-xs text-neutral-400">
-          La gestión de usuarios y permisos por rol se agrega en una etapa
-          posterior. Por ahora, los roles se asignan directamente en el Table
-          Editor de Supabase (tabla <code>profiles</code>).
-        </p>
       </div>
+
+      {profile?.role === "super_admin" && (
+        <div className="mt-6 max-w-lg rounded-lg border border-neutral-200 bg-white p-6">
+          <h2 className="text-sm font-semibold text-neutral-500">Equipo</h2>
+          <p className="mt-2 text-sm text-neutral-600">
+            Invita empleados y administra sus roles.
+          </p>
+          <Link
+            href="/app/configuracion/usuarios"
+            className="mt-3 inline-block text-sm font-medium text-[var(--brand-red)] hover:opacity-80"
+          >
+            Gestionar usuarios →
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

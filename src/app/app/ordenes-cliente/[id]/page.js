@@ -10,7 +10,7 @@ export default async function OrdenClienteDetailPage({ params }) {
   const { id } = await params;
   const supabase = await createClient();
 
-  const [{ data: order }, { data: items }, { data: attachments }] =
+  const [{ data: order }, { data: items }, { data: attachments }, { data: remisiones }] =
     await Promise.all([
       supabase
         .from("customer_orders")
@@ -30,6 +30,10 @@ export default async function OrdenClienteDetailPage({ params }) {
         .eq("entity_type", "customer_order")
         .eq("entity_id", id)
         .order("created_at", { ascending: false }),
+      supabase
+        .from("remisiones")
+        .select("id, remision_number")
+        .eq("customer_order_id", id),
     ]);
 
   if (!order) {
@@ -118,6 +122,23 @@ export default async function OrdenClienteDetailPage({ params }) {
               >
                 {order.quotations.quotation_number} →
               </Link>
+            </div>
+          )}
+
+          {remisiones?.length > 0 && (
+            <div className="rounded-lg border border-neutral-200 bg-white p-6">
+              <h2 className="text-sm font-semibold text-neutral-500">
+                Entregado por remisión
+              </h2>
+              {remisiones.map((remision) => (
+                <Link
+                  key={remision.id}
+                  href={`/app/remisiones/${remision.id}`}
+                  className="mt-2 block text-sm font-medium text-[var(--brand-red)] hover:opacity-80"
+                >
+                  {remision.remision_number} →
+                </Link>
+              ))}
             </div>
           )}
         </div>

@@ -4,6 +4,7 @@ import PageHeader from "@/components/app/PageHeader";
 import StatCard from "@/components/app/StatCard";
 import EmptyState from "@/components/app/EmptyState";
 import Badge from "@/components/app/Badge";
+import { computeNextAction } from "../oportunidades/nextAction";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -19,6 +20,7 @@ export default async function DashboardPage() {
     rfqsAwaiting,
     supplierOrdersOpen,
     newLeads,
+    opportunitiesWithProgress,
   ] = await Promise.all([
     supabase
       .from("opportunities")
@@ -65,11 +67,34 @@ export default async function DashboardPage() {
       .select("id, nombre, empresa, created_at")
       .eq("estatus", "nuevo")
       .order("created_at", { ascending: true }),
+    supabase
+      .from("opportunities")
+      .select(
+        `id, opportunity_number, status, customers(company_name),
+         quotations(id, status, created_at),
+         rfqs(id, status),
+         customer_orders(id, status),
+         supplier_orders(id, status)`
+      )
+      .in("status", ["open", "quoting"]),
   ]);
+
+  const stuckOpportunities = (opportunitiesWithProgress.data || [])
+    .map((opportunity) => ({ opportunity, next: computeNextAction(opportunity) }))
+    .filter(({ next }) => next?.tone === "red");
 
   const today = new Date().toISOString().slice(0, 10);
 
   const attention = [
+    ...stuckOpportunities.map(({ opportunity, next }) => ({
+      key: `op-${opportunity.id}`,
+      href: next.href || `/app/oportunidades/${opportunity.id}`,
+      title: opportunity.opportunity_number,
+      subtitle: opportunity.customers?.company_name,
+      badge: next.action,
+      badgeColor: "red",
+      note: next.label,
+    })),
     ...(newLeads.data || []).map((lead) => ({
       key: `lead-${lead.id}`,
       href: `/app/leads/${lead.id}`,
@@ -115,6 +140,11 @@ export default async function DashboardPage() {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <StatCard
+          label="Acciones urgentes"
+          value={stuckOpportunities.length}
+          hint="Oportunidades trabadas (sin cotizar o sin PO a proveedor)"
+        />
+        <StatCard
           label="Solicitudes nuevas"
           value={newLeadsResult.count ?? 0}
           hint="Del formulario de contacto"
@@ -154,7 +184,7 @@ export default async function DashboardPage() {
           {!attention.length ? (
             <EmptyState
               title="Todavía no hay nada pendiente de revisar"
-              description="Solicitudes nuevas del sitio, cotizaciones y RFQ enviadas esperando respuesta, y órdenes de proveedor atrasadas van a aparecer aquí."
+              description="Oportunidades trabadas, solicitudes nuevas del sitio, cotizaciones y RFQ enviadas esperando respuesta, y órdenes de proveedor atrasadas van a aparecer aquí."
             />
           ) : (
             <div className="divide-y divide-neutral-100 rounded-lg border border-neutral-200 bg-white">

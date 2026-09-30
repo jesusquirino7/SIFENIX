@@ -86,6 +86,18 @@ export const LEAD_STATUS_FLOW = {
   descartado: ["nuevo"],
 };
 
+export const REMISION_STATUS = {
+  entregada: { label: "Entregada", color: "blue" },
+  formalizada: { label: "Formalizada", color: "green" },
+  cancelada: { label: "Cancelada", color: "red" },
+};
+
+export const REMISION_STATUS_FLOW = {
+  entregada: ["formalizada", "cancelada"],
+  formalizada: [],
+  cancelada: ["entregada"],
+};
+
 // Indicador de "salud de entrega" para ordenes con expected_delivery_date:
 // compara la fecha esperada contra hoy (independiente del status
 // confirmada/en transito/etc.) para saber si esta atrasada, por cumplir

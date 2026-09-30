@@ -6,6 +6,7 @@ import Badge from "@/components/app/Badge";
 import { getDeliveryHealth } from "@/components/app/statusColors";
 
 const TIPOS = [
+  { value: "oportunidad", label: "Oportunidades" },
   { value: "cotizacion", label: "Cotizaciones" },
   { value: "rfq", label: "RFQ" },
   { value: "orden-cliente", label: "Órdenes de Cliente" },
@@ -14,9 +15,24 @@ const TIPOS = [
 
 const TONE_RANK = { red: 0, amber: 1, blue: 2, gray: 3 };
 
-function buildItems({ quotations, rfqs, customerOrders, supplierOrders }) {
+function buildItems({ opportunities, quotations, rfqs, customerOrders, supplierOrders }) {
   const today = new Date().toISOString().slice(0, 10);
   const items = [];
+
+  for (const o of opportunities || []) {
+    items.push({
+      key: `op-${o.id}`,
+      tipo: "oportunidad",
+      tipoLabel: "Oportunidad",
+      href: `/app/oportunidades/${o.id}`,
+      folio: o.opportunity_number,
+      party: o.customers?.company_name,
+      operation: null,
+      tone: o.status === "quoting" ? "amber" : "blue",
+      label: o.status === "quoting" ? "Cotizando" : "Esperando decisión del cliente",
+      date: null,
+    });
+  }
 
   for (const q of quotations || []) {
     if (q.status === "draft") {
@@ -128,11 +144,16 @@ export default async function SeguimientoPage({ searchParams }) {
   const supabase = await createClient();
 
   const [
+    { data: opportunities },
     { data: quotations },
     { data: rfqs },
     { data: customerOrders },
     { data: supplierOrders },
   ] = await Promise.all([
+    supabase
+      .from("opportunities")
+      .select("id, opportunity_number, status, customers(company_name)")
+      .in("status", ["open", "quoting"]),
     supabase
       .from("quotations")
       .select("id, quotation_number, status, valid_until, opportunities(opportunity_number, customers(company_name))")
@@ -151,7 +172,13 @@ export default async function SeguimientoPage({ searchParams }) {
       .in("status", ["confirmed", "in_process"]),
   ]);
 
-  const allItems = buildItems({ quotations, rfqs, customerOrders, supplierOrders });
+  const allItems = buildItems({
+    opportunities,
+    quotations,
+    rfqs,
+    customerOrders,
+    supplierOrders,
+  });
 
   const counts = TIPOS.reduce((acc, t) => {
     acc[t.value] = allItems.filter((i) => i.tipo === t.value).length;

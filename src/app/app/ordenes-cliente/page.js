@@ -54,8 +54,20 @@ export default async function OrdenesClientePage() {
               {orders.map((order) => {
                 const status =
                   CUSTOMER_ORDER_STATUS[order.status] || CUSTOMER_ORDER_STATUS.confirmed;
+                // Todavía falta comprarle/recibirle al proveedor — sin
+                // contar cuántas órdenes a proveedor exactas hacen falta,
+                // solo un recordatorio hasta que quede Entregada.
+                const pendingFulfillment =
+                  order.status === "confirmed" || order.status === "in_process";
                 return (
-                  <tr key={order.id} className="hover:bg-neutral-50">
+                  <tr
+                    key={order.id}
+                    className={
+                      pendingFulfillment
+                        ? "border-l-2 border-amber-400 bg-amber-50/60 hover:bg-amber-50"
+                        : "hover:bg-neutral-50"
+                    }
+                  >
                     <td className="px-4 py-3">
                       <Link
                         href={`/app/ordenes-cliente/${order.id}`}

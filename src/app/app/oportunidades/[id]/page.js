@@ -9,6 +9,7 @@ import {
   RFQ_STATUS,
   CUSTOMER_ORDER_STATUS,
   SUPPLIER_ORDER_STATUS,
+  REMISION_STATUS,
   getDeliveryHealth,
 } from "@/components/app/statusColors";
 import EstadoOportunidad from "./EstadoOportunidad";
@@ -25,6 +26,7 @@ export default async function OportunidadDetailPage({ params }) {
     { data: rfqs },
     { data: orders },
     { data: supplierOrders },
+    { data: remisiones },
   ] = await Promise.all([
     supabase
       .from("opportunities")
@@ -54,6 +56,11 @@ export default async function OportunidadDetailPage({ params }) {
     supabase
       .from("supplier_orders")
       .select("id, order_number, status, currency, expected_delivery_date, suppliers(company_name), supplier_order_items(quantity, unit_cost)")
+      .eq("opportunity_id", id)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("remisiones")
+      .select("id, remision_number, status, delivered_at")
       .eq("opportunity_id", id)
       .order("created_at", { ascending: false }),
   ]);
@@ -338,6 +345,50 @@ export default async function OportunidadDetailPage({ params }) {
                           )}
                           <Badge color={status.color}>{status.label}</Badge>
                         </span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-neutral-500">
+                Remisiones
+              </h2>
+              <Link
+                href={`/app/oportunidades/${opportunity.id}/remision/nueva`}
+                className="text-sm font-medium text-[var(--brand-red)] hover:opacity-80"
+              >
+                + Nueva remisión
+              </Link>
+            </div>
+            <div className="mt-3">
+              {!remisiones?.length ? (
+                <EmptyState
+                  title="Todavía no hay remisiones"
+                  description="Si el material ya está en existencia y se entrega antes del proceso formal, da clic en 'Nueva remisión'."
+                />
+              ) : (
+                <div className="divide-y divide-neutral-100 rounded-lg border border-neutral-200 bg-white">
+                  {remisiones.map((remision) => {
+                    const status =
+                      REMISION_STATUS[remision.status] || REMISION_STATUS.entregada;
+                    return (
+                      <Link
+                        key={remision.id}
+                        href={`/app/remisiones/${remision.id}`}
+                        className="flex items-center justify-between px-4 py-3 text-sm hover:bg-neutral-50"
+                      >
+                        <span className="font-medium text-neutral-900">
+                          {remision.remision_number}
+                        </span>
+                        <span className="text-neutral-600">
+                          {remision.delivered_at}
+                        </span>
+                        <Badge color={status.color}>{status.label}</Badge>
                       </Link>
                     );
                   })}

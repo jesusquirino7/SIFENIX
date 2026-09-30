@@ -13,11 +13,7 @@ export default function EstadoRemision({ remisionId, status }) {
   const [saving, setSaving] = useState(false);
 
   const current = REMISION_STATUS[status] || REMISION_STATUS.entregada;
-  // "formalizada" solo se llega via FormalizarRemision (necesita elegir la
-  // orden de cliente) - aqui no se ofrece como botón directo.
-  const nextOptions = (REMISION_STATUS_FLOW[status] || []).filter(
-    (next) => next !== "formalizada"
-  );
+  const nextOptions = REMISION_STATUS_FLOW[status] || [];
 
   async function changeStatus(nextStatus) {
     setSaving(true);

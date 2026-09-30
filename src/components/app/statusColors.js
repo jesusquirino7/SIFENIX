@@ -88,13 +88,18 @@ export const LEAD_STATUS_FLOW = {
 
 export const REMISION_STATUS = {
   entregada: { label: "Entregada", color: "blue" },
-  formalizada: { label: "Formalizada", color: "green" },
+  facturada: { label: "Facturada", color: "amber" },
+  confirmada: { label: "Confirmada", color: "green" },
   cancelada: { label: "Cancelada", color: "red" },
 };
 
+// Para ventas por cotizacion informal (sin pasar por Orden de Cliente):
+// entregada -> facturada -> confirmada. cancelada se puede marcar desde
+// entregada o facturada, y reabrir de vuelta a entregada si hace falta.
 export const REMISION_STATUS_FLOW = {
-  entregada: ["formalizada", "cancelada"],
-  formalizada: [],
+  entregada: ["facturada", "cancelada"],
+  facturada: ["confirmada", "cancelada"],
+  confirmada: [],
   cancelada: ["entregada"],
 };
 

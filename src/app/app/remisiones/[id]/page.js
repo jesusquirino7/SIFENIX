@@ -5,7 +5,7 @@ import PageHeader from "@/components/app/PageHeader";
 import AttachmentsPanel from "@/components/app/AttachmentsPanel";
 import EstadoRemision from "./EstadoRemision";
 import RemisionItemsEditor from "./RemisionItemsEditor";
-import FormalizarRemision from "./FormalizarRemision";
+import OrdenClienteRelacionada from "./OrdenClienteRelacionada";
 
 export default async function RemisionDetailPage({ params }) {
   const { id } = await params;
@@ -37,15 +37,11 @@ export default async function RemisionDetailPage({ params }) {
     notFound();
   }
 
-  let availableOrders = [];
-  if (remision.status === "entregada") {
-    const { data: orders } = await supabase
-      .from("customer_orders")
-      .select("id, order_number")
-      .eq("opportunity_id", remision.opportunity_id)
-      .order("created_at", { ascending: false });
-    availableOrders = orders || [];
-  }
+  const { data: opportunityOrders } = await supabase
+    .from("customer_orders")
+    .select("id, order_number")
+    .eq("opportunity_id", remision.opportunity_id)
+    .order("created_at", { ascending: false });
 
   return (
     <div>
@@ -73,35 +69,6 @@ export default async function RemisionDetailPage({ params }) {
             </div>
           )}
 
-          <div className="rounded-lg border border-neutral-200 bg-white p-6">
-            <h2 className="text-sm font-semibold text-neutral-500">
-              Formalización
-            </h2>
-            <div className="mt-3">
-              {remision.customer_orders?.id ? (
-                <p className="text-sm text-neutral-600">
-                  Ligada a la orden de cliente{" "}
-                  <Link
-                    href={`/app/ordenes-cliente/${remision.customer_orders.id}`}
-                    className="font-medium text-[var(--brand-red)] hover:opacity-80"
-                  >
-                    {remision.customer_orders.order_number}
-                  </Link>
-                  .
-                </p>
-              ) : remision.status === "cancelada" ? (
-                <p className="text-sm text-neutral-500">
-                  Remisión cancelada — no aplica formalizar.
-                </p>
-              ) : (
-                <FormalizarRemision
-                  remisionId={remision.id}
-                  customerOrders={availableOrders}
-                />
-              )}
-            </div>
-          </div>
-
           <AttachmentsPanel
             entityType="remision"
             entityId={remision.id}
@@ -117,6 +84,19 @@ export default async function RemisionDetailPage({ params }) {
             <p className="mt-2 text-sm text-neutral-600">
               {remision.delivered_at}
             </p>
+          </div>
+
+          <div className="rounded-lg border border-neutral-200 bg-white p-6">
+            <h2 className="text-sm font-semibold text-neutral-500">
+              Orden de cliente relacionada
+            </h2>
+            <div className="mt-2">
+              <OrdenClienteRelacionada
+                remisionId={remision.id}
+                currentOrderId={remision.customer_order_id}
+                customerOrders={opportunityOrders || []}
+              />
+            </div>
           </div>
 
           <div className="rounded-lg border border-neutral-200 bg-white p-6">

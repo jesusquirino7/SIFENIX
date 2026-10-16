@@ -51,7 +51,17 @@ export default async function CotizacionDetailPage({ params }) {
           { label: quotation.quotation_number },
         ]}
         action={
-          <EstadoCotizacion quotationId={quotation.id} status={quotation.status} />
+          <div className="flex items-center gap-3">
+            <a
+              href={`/api/cotizaciones/${quotation.id}/pdf`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm font-medium text-neutral-600 transition-colors hover:border-[var(--brand-red)] hover:text-[var(--brand-red)]"
+            >
+              Descargar PDF
+            </a>
+            <EstadoCotizacion quotationId={quotation.id} status={quotation.status} />
+          </div>
         }
       />
 

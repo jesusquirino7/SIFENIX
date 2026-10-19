@@ -4,6 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import PageHeader from "@/components/app/PageHeader";
 import AttachmentsPanel from "@/components/app/AttachmentsPanel";
 import MilestonesPanel from "@/components/app/MilestonesPanel";
+import HistorialEstatusTile from "@/components/app/HistorialEstatusTile";
+import { CUSTOMER_ORDER_STATUS } from "@/components/app/statusColors";
 import EstadoOrdenCliente from "./EstadoOrdenCliente";
 import OrdenClienteEditor from "./OrdenClienteEditor";
 
@@ -17,6 +19,7 @@ export default async function OrdenClienteDetailPage({ params }) {
     { data: attachments },
     { data: remisiones },
     { data: milestones },
+    { data: statusHistory },
   ] = await Promise.all([
     supabase
       .from("customer_orders")
@@ -45,6 +48,12 @@ export default async function OrdenClienteDetailPage({ params }) {
       .select("*")
       .eq("entity_type", "customer_order")
       .eq("entity_id", id),
+    supabase
+      .from("audit_log")
+      .select("id, old_data, new_data, changed_at, profiles(full_name)")
+      .eq("table_name", "customer_orders")
+      .eq("record_id", id)
+      .order("changed_at", { ascending: false }),
   ]);
 
   if (!order) {
@@ -154,6 +163,8 @@ export default async function OrdenClienteDetailPage({ params }) {
               ))}
             </div>
           )}
+
+          <HistorialEstatusTile entries={statusHistory} statusMap={CUSTOMER_ORDER_STATUS} />
         </div>
       </div>
     </div>

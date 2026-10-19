@@ -5,7 +5,8 @@ import PageHeader from "@/components/app/PageHeader";
 import AttachmentsPanel from "@/components/app/AttachmentsPanel";
 import EmptyState from "@/components/app/EmptyState";
 import Badge from "@/components/app/Badge";
-import { SUPPLIER_ORDER_STATUS } from "@/components/app/statusColors";
+import HistorialEstatusTile from "@/components/app/HistorialEstatusTile";
+import { SUPPLIER_ORDER_STATUS, RFQ_STATUS } from "@/components/app/statusColors";
 import EstadoRfq from "./EstadoRfq";
 import RfqItemsEditor from "./RfqItemsEditor";
 
@@ -13,8 +14,13 @@ export default async function RfqDetailPage({ params }) {
   const { id } = await params;
   const supabase = await createClient();
 
-  const [{ data: rfq }, { data: items }, { data: attachments }, { data: orders }] =
-    await Promise.all([
+  const [
+    { data: rfq },
+    { data: items },
+    { data: attachments },
+    { data: orders },
+    { data: statusHistory },
+  ] = await Promise.all([
       supabase
         .from("rfqs")
         .select(
@@ -38,6 +44,12 @@ export default async function RfqDetailPage({ params }) {
         .select("id, order_number, status")
         .eq("rfq_id", id)
         .order("created_at", { ascending: false }),
+      supabase
+        .from("audit_log")
+        .select("id, old_data, new_data, changed_at, profiles(full_name)")
+        .eq("table_name", "rfqs")
+        .eq("record_id", id)
+        .order("changed_at", { ascending: false }),
     ]);
 
   if (!rfq) {
@@ -161,6 +173,8 @@ export default async function RfqDetailPage({ params }) {
               </Link>
             )}
           </div>
+
+          <HistorialEstatusTile entries={statusHistory} statusMap={RFQ_STATUS} />
         </div>
       </div>
     </div>

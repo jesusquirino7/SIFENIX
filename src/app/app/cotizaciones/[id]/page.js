@@ -5,7 +5,8 @@ import PageHeader from "@/components/app/PageHeader";
 import AttachmentsPanel from "@/components/app/AttachmentsPanel";
 import EmptyState from "@/components/app/EmptyState";
 import Badge from "@/components/app/Badge";
-import { CUSTOMER_ORDER_STATUS } from "@/components/app/statusColors";
+import HistorialEstatusTile from "@/components/app/HistorialEstatusTile";
+import { CUSTOMER_ORDER_STATUS, QUOTATION_STATUS } from "@/components/app/statusColors";
 import EstadoCotizacion from "./EstadoCotizacion";
 import CotizacionEditor from "./CotizacionEditor";
 
@@ -13,8 +14,13 @@ export default async function CotizacionDetailPage({ params }) {
   const { id } = await params;
   const supabase = await createClient();
 
-  const [{ data: quotation }, { data: items }, { data: attachments }, { data: orders }] =
-    await Promise.all([
+  const [
+    { data: quotation },
+    { data: items },
+    { data: attachments },
+    { data: orders },
+    { data: statusHistory },
+  ] = await Promise.all([
       supabase
         .from("quotations")
         .select("*, opportunities(id, opportunity_number, name, customers(id, company_name, email))")
@@ -36,6 +42,12 @@ export default async function CotizacionDetailPage({ params }) {
         .select("id, order_number, status")
         .eq("quotation_id", id)
         .order("created_at", { ascending: false }),
+      supabase
+        .from("audit_log")
+        .select("id, old_data, new_data, changed_at, profiles(full_name)")
+        .eq("table_name", "quotations")
+        .eq("record_id", id)
+        .order("changed_at", { ascending: false }),
     ]);
 
   if (!quotation) {
@@ -165,6 +177,8 @@ export default async function CotizacionDetailPage({ params }) {
               {quotation.valid_until || "Sin fecha límite"}
             </p>
           </div>
+
+          <HistorialEstatusTile entries={statusHistory} statusMap={QUOTATION_STATUS} />
         </div>
       </div>
     </div>

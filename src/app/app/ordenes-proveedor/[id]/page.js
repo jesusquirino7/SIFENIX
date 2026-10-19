@@ -4,7 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import PageHeader from "@/components/app/PageHeader";
 import AttachmentsPanel from "@/components/app/AttachmentsPanel";
 import Badge from "@/components/app/Badge";
-import { getDeliveryHealth } from "@/components/app/statusColors";
+import HistorialEstatusTile from "@/components/app/HistorialEstatusTile";
+import { getDeliveryHealth, SUPPLIER_ORDER_STATUS } from "@/components/app/statusColors";
 import EstadoOrdenProveedor from "./EstadoOrdenProveedor";
 import OrdenProveedorEditor from "./OrdenProveedorEditor";
 
@@ -12,7 +13,7 @@ export default async function OrdenProveedorDetailPage({ params }) {
   const { id } = await params;
   const supabase = await createClient();
 
-  const [{ data: order }, { data: items }, { data: attachments }] =
+  const [{ data: order }, { data: items }, { data: attachments }, { data: statusHistory }] =
     await Promise.all([
       supabase
         .from("supplier_orders")
@@ -32,6 +33,12 @@ export default async function OrdenProveedorDetailPage({ params }) {
         .eq("entity_type", "supplier_order")
         .eq("entity_id", id)
         .order("created_at", { ascending: false }),
+      supabase
+        .from("audit_log")
+        .select("id, old_data, new_data, changed_at, profiles(full_name)")
+        .eq("table_name", "supplier_orders")
+        .eq("record_id", id)
+        .order("changed_at", { ascending: false }),
     ]);
 
   if (!order) {
@@ -133,6 +140,8 @@ export default async function OrdenProveedorDetailPage({ params }) {
               </Link>
             </div>
           )}
+
+          <HistorialEstatusTile entries={statusHistory} statusMap={SUPPLIER_ORDER_STATUS} />
         </div>
       </div>
     </div>

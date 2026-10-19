@@ -4,7 +4,9 @@ import { createClient } from "@/lib/supabase/server";
 import PageHeader from "@/components/app/PageHeader";
 import Badge from "@/components/app/Badge";
 import EmptyState from "@/components/app/EmptyState";
+import HistorialEstatusTile from "@/components/app/HistorialEstatusTile";
 import {
+  OPPORTUNITY_STATUS,
   QUOTATION_STATUS,
   RFQ_STATUS,
   CUSTOMER_ORDER_STATUS,
@@ -29,6 +31,7 @@ export default async function OportunidadDetailPage({ params }) {
     { data: orders },
     { data: supplierOrders },
     { data: remisiones },
+    { data: statusHistory },
   ] = await Promise.all([
     supabase
       .from("opportunities")
@@ -67,6 +70,12 @@ export default async function OportunidadDetailPage({ params }) {
       .select("id, remision_number, status, delivered_at")
       .eq("opportunity_id", id)
       .order("created_at", { ascending: false }),
+    supabase
+      .from("audit_log")
+      .select("id, old_data, new_data, changed_at, profiles(full_name)")
+      .eq("table_name", "opportunities")
+      .eq("record_id", id)
+      .order("changed_at", { ascending: false }),
   ]);
 
   if (!opportunity) {
@@ -480,6 +489,8 @@ export default async function OportunidadDetailPage({ params }) {
               </div>
             </dl>
           </div>
+
+          <HistorialEstatusTile entries={statusHistory} statusMap={OPPORTUNITY_STATUS} />
         </div>
       </div>
     </div>

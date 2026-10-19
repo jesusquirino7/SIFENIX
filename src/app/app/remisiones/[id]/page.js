@@ -4,6 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import PageHeader from "@/components/app/PageHeader";
 import AttachmentsPanel from "@/components/app/AttachmentsPanel";
 import MilestonesPanel from "@/components/app/MilestonesPanel";
+import HistorialEstatusTile from "@/components/app/HistorialEstatusTile";
+import { REMISION_STATUS } from "@/components/app/statusColors";
 import EstadoRemision from "./EstadoRemision";
 import RemisionItemsEditor from "./RemisionItemsEditor";
 import OrdenClienteRelacionada from "./OrdenClienteRelacionada";
@@ -12,8 +14,13 @@ export default async function RemisionDetailPage({ params }) {
   const { id } = await params;
   const supabase = await createClient();
 
-  const [{ data: remision }, { data: items }, { data: attachments }, { data: milestones }] =
-    await Promise.all([
+  const [
+    { data: remision },
+    { data: items },
+    { data: attachments },
+    { data: milestones },
+    { data: statusHistory },
+  ] = await Promise.all([
       supabase
         .from("remisiones")
         .select(
@@ -37,6 +44,12 @@ export default async function RemisionDetailPage({ params }) {
         .select("*")
         .eq("entity_type", "remision")
         .eq("entity_id", id),
+      supabase
+        .from("audit_log")
+        .select("id, old_data, new_data, changed_at, profiles(full_name)")
+        .eq("table_name", "remisiones")
+        .eq("record_id", id)
+        .order("changed_at", { ascending: false }),
     ]);
 
   if (!remision) {
@@ -134,6 +147,8 @@ export default async function RemisionDetailPage({ params }) {
               </p>
             )}
           </div>
+
+          <HistorialEstatusTile entries={statusHistory} statusMap={REMISION_STATUS} />
         </div>
       </div>
     </div>

@@ -1,8 +1,15 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+
+async function getOrigin() {
+  const h = await headers();
+  const proto = h.get("x-forwarded-proto") || "http";
+  return `${proto}://${h.get("host")}`;
+}
 
 const VALID_ROLES = ["super_admin", "admin", "sales", "purchasing", "operations"];
 
@@ -41,8 +48,10 @@ export async function inviteUser({ email, fullName, role }) {
   }
 
   const admin = createAdminClient();
+  const origin = await getOrigin();
   const { data, error } = await admin.auth.admin.inviteUserByEmail(email.trim(), {
     data: { full_name: fullName?.trim() || email.trim() },
+    redirectTo: `${origin}/auth/callback`,
   });
 
   if (error) {

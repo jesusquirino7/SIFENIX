@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import PageHeader from "@/components/app/PageHeader";
 import Badge from "@/components/app/Badge";
+import CambiarContrasenaButton from "./CambiarContrasenaButton";
 
 export default async function ConfiguracionPage() {
   const supabase = await createClient();
@@ -41,6 +42,7 @@ export default async function ConfiguracionPage() {
             </dd>
           </div>
         </dl>
+        <CambiarContrasenaButton />
       </div>
 
       {profile?.role === "super_admin" && (

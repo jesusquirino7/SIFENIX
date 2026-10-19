@@ -30,7 +30,7 @@ const NAV_GROUPS = [
     label: null,
     items: [
       { href: "/app/seguimiento", label: "Seguimiento" },
-      { href: "/app/reportes", label: "Reportes" },
+      { href: "/app/reportes", label: "Reportes", hideFor: ["sales"] },
     ],
   },
   {
@@ -47,7 +47,7 @@ const NAV_GROUPS = [
   },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ role }) {
   const pathname = usePathname();
 
   return (
@@ -69,7 +69,9 @@ export default function Sidebar() {
               </p>
             )}
             <ul className="space-y-0.5">
-              {group.items.map((item) => {
+              {group.items
+                .filter((item) => !item.hideFor?.includes(role))
+                .map((item) => {
                 const active =
                   pathname === item.href || pathname.startsWith(item.href + "/");
                 return (

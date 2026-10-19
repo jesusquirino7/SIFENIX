@@ -31,7 +31,7 @@ export default async function AppLayout({ children }) {
   return (
     <ToastProvider>
       <div className="flex min-h-screen bg-neutral-50">
-        <Sidebar />
+        <Sidebar role={profile?.role} />
         <div className="flex min-w-0 flex-1 flex-col">
           <Topbar profile={profile} />
           <main className="flex-1 overflow-y-auto p-4 lg:p-6">

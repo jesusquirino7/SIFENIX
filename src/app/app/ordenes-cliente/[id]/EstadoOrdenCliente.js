@@ -5,10 +5,15 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/components/app/ToastProvider";
 import Badge from "@/components/app/Badge";
+import ConfirmButton from "@/components/app/ConfirmButton";
 import {
   CUSTOMER_ORDER_STATUS,
   CUSTOMER_ORDER_STATUS_FLOW,
 } from "@/components/app/statusColors";
+
+const CRITICAL = new Set(["cancelled"]);
+const BUTTON_CLASS =
+  "rounded-md border border-neutral-300 px-3 py-1.5 text-sm font-medium text-neutral-600 transition-colors hover:border-[var(--brand-red)] hover:text-[var(--brand-red)] disabled:opacity-50";
 
 export default function EstadoOrdenCliente({ orderId, status }) {
   const router = useRouter();
@@ -29,7 +34,7 @@ export default function EstadoOrdenCliente({ orderId, status }) {
 
     if (error) {
       showToast("No se pudo cambiar el estatus: " + error.message, "error");
-      return;
+      throw error;
     }
 
     showToast(
@@ -41,17 +46,30 @@ export default function EstadoOrdenCliente({ orderId, status }) {
   return (
     <div className="flex items-center gap-3">
       <Badge color={current.color}>{current.label}</Badge>
-      {nextOptions.map((next) => (
-        <button
-          key={next}
-          type="button"
-          disabled={saving}
-          onClick={() => changeStatus(next)}
-          className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm font-medium text-neutral-600 transition-colors hover:border-[var(--brand-red)] hover:text-[var(--brand-red)] disabled:opacity-50"
-        >
-          Marcar como {CUSTOMER_ORDER_STATUS[next].label.toLowerCase()}
-        </button>
-      ))}
+      {nextOptions.map((next) =>
+        CRITICAL.has(next) ? (
+          <ConfirmButton
+            key={next}
+            label={`Marcar como ${CUSTOMER_ORDER_STATUS[next].label.toLowerCase()}`}
+            title={`¿Marcar como ${CUSTOMER_ORDER_STATUS[next].label.toLowerCase()}?`}
+            description="Esta acción queda registrada en el historial de la orden."
+            variant="danger"
+            disabled={saving}
+            className={BUTTON_CLASS}
+            onConfirm={() => changeStatus(next)}
+          />
+        ) : (
+          <button
+            key={next}
+            type="button"
+            disabled={saving}
+            onClick={() => changeStatus(next)}
+            className={BUTTON_CLASS}
+          >
+            Marcar como {CUSTOMER_ORDER_STATUS[next].label.toLowerCase()}
+          </button>
+        )
+      )}
     </div>
   );
 }

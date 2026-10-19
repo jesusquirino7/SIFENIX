@@ -14,6 +14,8 @@ import {
 } from "@/components/app/statusColors";
 import EstadoOportunidad from "./EstadoOportunidad";
 import EditarOportunidadForm from "./EditarOportunidadForm";
+import PipelineView from "./PipelineView";
+import { computePipelineStages } from "./pipelineStages";
 
 export default async function OportunidadDetailPage({ params }) {
   const { id } = await params;
@@ -70,6 +72,37 @@ export default async function OportunidadDetailPage({ params }) {
   if (!opportunity) {
     notFound();
   }
+
+  const customerOrderIds = (orders || []).map((o) => o.id);
+  const remisionIds = (remisiones || []).map((r) => r.id);
+
+  const [{ data: orderMilestones }, { data: remisionMilestones }] = await Promise.all([
+    customerOrderIds.length
+      ? supabase
+          .from("milestones")
+          .select("*")
+          .eq("entity_type", "customer_order")
+          .in("entity_id", customerOrderIds)
+      : Promise.resolve({ data: [] }),
+    remisionIds.length
+      ? supabase
+          .from("milestones")
+          .select("*")
+          .eq("entity_type", "remision")
+          .in("entity_id", remisionIds)
+      : Promise.resolve({ data: [] }),
+  ]);
+
+  const pipelineStages = computePipelineStages({
+    opportunity,
+    quotations: quotations || [],
+    rfqs: rfqs || [],
+    customerOrders: orders || [],
+    supplierOrders: supplierOrders || [],
+    remisiones: remisiones || [],
+    orderMilestones: orderMilestones || [],
+    remisionMilestones: remisionMilestones || [],
+  });
 
   return (
     <div>
@@ -401,6 +434,8 @@ export default async function OportunidadDetailPage({ params }) {
         </div>
 
         <div className="space-y-6">
+          <PipelineView stages={pipelineStages} />
+
           <div className="rounded-lg border border-neutral-200 bg-white p-6">
             <h2 className="text-sm font-semibold text-neutral-500">Cliente</h2>
             <p className="mt-2 font-medium text-neutral-900">

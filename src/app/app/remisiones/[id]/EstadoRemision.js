@@ -5,7 +5,12 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/components/app/ToastProvider";
 import Badge from "@/components/app/Badge";
+import ConfirmButton from "@/components/app/ConfirmButton";
 import { REMISION_STATUS, REMISION_STATUS_FLOW } from "@/components/app/statusColors";
+
+const CRITICAL = new Set(["cancelada"]);
+const BUTTON_CLASS =
+  "rounded-md border border-neutral-300 px-3 py-1.5 text-sm font-medium text-neutral-600 transition-colors hover:border-[var(--brand-red)] hover:text-[var(--brand-red)] disabled:opacity-50";
 
 export default function EstadoRemision({ remisionId, status }) {
   const router = useRouter();
@@ -26,7 +31,7 @@ export default function EstadoRemision({ remisionId, status }) {
 
     if (error) {
       showToast("No se pudo cambiar el estatus: " + error.message, "error");
-      return;
+      throw error;
     }
 
     showToast(`Remisión marcada como ${REMISION_STATUS[nextStatus].label.toLowerCase()}.`);
@@ -36,17 +41,30 @@ export default function EstadoRemision({ remisionId, status }) {
   return (
     <div className="flex items-center gap-3">
       <Badge color={current.color}>{current.label}</Badge>
-      {nextOptions.map((next) => (
-        <button
-          key={next}
-          type="button"
-          disabled={saving}
-          onClick={() => changeStatus(next)}
-          className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm font-medium text-neutral-600 transition-colors hover:border-[var(--brand-red)] hover:text-[var(--brand-red)] disabled:opacity-50"
-        >
-          Marcar como {REMISION_STATUS[next].label.toLowerCase()}
-        </button>
-      ))}
+      {nextOptions.map((next) =>
+        CRITICAL.has(next) ? (
+          <ConfirmButton
+            key={next}
+            label={`Marcar como ${REMISION_STATUS[next].label.toLowerCase()}`}
+            title={`¿Marcar como ${REMISION_STATUS[next].label.toLowerCase()}?`}
+            description="Esta acción queda registrada en el historial de la remisión."
+            variant="danger"
+            disabled={saving}
+            className={BUTTON_CLASS}
+            onConfirm={() => changeStatus(next)}
+          />
+        ) : (
+          <button
+            key={next}
+            type="button"
+            disabled={saving}
+            onClick={() => changeStatus(next)}
+            className={BUTTON_CLASS}
+          >
+            Marcar como {REMISION_STATUS[next].label.toLowerCase()}
+          </button>
+        )
+      )}
     </div>
   );
 }

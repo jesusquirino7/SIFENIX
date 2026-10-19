@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import PageHeader from "@/components/app/PageHeader";
 import AttachmentsPanel from "@/components/app/AttachmentsPanel";
+import MilestonesPanel from "@/components/app/MilestonesPanel";
 import EstadoRemision from "./EstadoRemision";
 import RemisionItemsEditor from "./RemisionItemsEditor";
 import OrdenClienteRelacionada from "./OrdenClienteRelacionada";
@@ -11,7 +12,7 @@ export default async function RemisionDetailPage({ params }) {
   const { id } = await params;
   const supabase = await createClient();
 
-  const [{ data: remision }, { data: items }, { data: attachments }] =
+  const [{ data: remision }, { data: items }, { data: attachments }, { data: milestones }] =
     await Promise.all([
       supabase
         .from("remisiones")
@@ -31,6 +32,11 @@ export default async function RemisionDetailPage({ params }) {
         .eq("entity_type", "remision")
         .eq("entity_id", id)
         .order("created_at", { ascending: false }),
+      supabase
+        .from("milestones")
+        .select("*")
+        .eq("entity_type", "remision")
+        .eq("entity_id", id),
     ]);
 
   if (!remision) {
@@ -68,6 +74,8 @@ export default async function RemisionDetailPage({ params }) {
               <p className="mt-2 text-sm text-neutral-600">{remision.notes}</p>
             </div>
           )}
+
+          <MilestonesPanel entityType="remision" milestones={milestones} />
 
           <AttachmentsPanel
             entityType="remision"

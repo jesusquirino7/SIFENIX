@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import PageHeader from "@/components/app/PageHeader";
 import AttachmentsPanel from "@/components/app/AttachmentsPanel";
+import MilestonesPanel from "@/components/app/MilestonesPanel";
 import EstadoOrdenCliente from "./EstadoOrdenCliente";
 import OrdenClienteEditor from "./OrdenClienteEditor";
 
@@ -10,31 +11,41 @@ export default async function OrdenClienteDetailPage({ params }) {
   const { id } = await params;
   const supabase = await createClient();
 
-  const [{ data: order }, { data: items }, { data: attachments }, { data: remisiones }] =
-    await Promise.all([
-      supabase
-        .from("customer_orders")
-        .select(
-          "*, opportunities(id, opportunity_number, name, customers(id, company_name, email)), quotations(id, quotation_number)"
-        )
-        .eq("id", id)
-        .maybeSingle(),
-      supabase
-        .from("customer_order_items")
-        .select("*")
-        .eq("customer_order_id", id)
-        .order("created_at", { ascending: true }),
-      supabase
-        .from("attachments")
-        .select("*")
-        .eq("entity_type", "customer_order")
-        .eq("entity_id", id)
-        .order("created_at", { ascending: false }),
-      supabase
-        .from("remisiones")
-        .select("id, remision_number")
-        .eq("customer_order_id", id),
-    ]);
+  const [
+    { data: order },
+    { data: items },
+    { data: attachments },
+    { data: remisiones },
+    { data: milestones },
+  ] = await Promise.all([
+    supabase
+      .from("customer_orders")
+      .select(
+        "*, opportunities(id, opportunity_number, name, customers(id, company_name, email)), quotations(id, quotation_number)"
+      )
+      .eq("id", id)
+      .maybeSingle(),
+    supabase
+      .from("customer_order_items")
+      .select("*")
+      .eq("customer_order_id", id)
+      .order("created_at", { ascending: true }),
+    supabase
+      .from("attachments")
+      .select("*")
+      .eq("entity_type", "customer_order")
+      .eq("entity_id", id)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("remisiones")
+      .select("id, remision_number")
+      .eq("customer_order_id", id),
+    supabase
+      .from("milestones")
+      .select("*")
+      .eq("entity_type", "customer_order")
+      .eq("entity_id", id),
+  ]);
 
   if (!order) {
     notFound();
@@ -65,6 +76,8 @@ export default async function OrdenClienteDetailPage({ params }) {
               <p className="mt-2 text-sm text-neutral-600">{order.notes}</p>
             </div>
           )}
+
+          <MilestonesPanel entityType="customer_order" milestones={milestones} />
 
           <AttachmentsPanel
             entityType="customer_order"

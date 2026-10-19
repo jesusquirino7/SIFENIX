@@ -16,12 +16,12 @@ export default async function RfqProveedoresPage() {
 
   return (
     <div>
-      <PageHeader title="RFQ Proveedores" />
+      <PageHeader title="Cotizaciones a Proveedores" />
 
       {!rfqs?.length ? (
         <EmptyState
-          title="Todavía no hay RFQ enviadas"
-          description="Una RFQ siempre nace desde una oportunidad: entra al detalle de la operación y da clic en 'Nueva RFQ'."
+          title="Todavía no hay cotizaciones a proveedores enviadas"
+          description="Una cotización a proveedor siempre nace desde una oportunidad: entra al detalle de la operación y da clic en 'Nueva cotización a proveedor'."
           action={
             <Link
               href="/app/oportunidades"
@@ -36,7 +36,7 @@ export default async function RfqProveedoresPage() {
           <table className="w-full text-left text-sm">
             <thead className="border-b border-neutral-200 bg-neutral-50 text-xs uppercase tracking-wide text-neutral-500">
               <tr>
-                <th className="px-4 py-3 font-medium">RFQ</th>
+                <th className="px-4 py-3 font-medium">Folio</th>
                 <th className="px-4 py-3 font-medium">Proveedor</th>
                 <th className="px-4 py-3 font-medium">Operación / Cliente</th>
                 <th className="px-4 py-3 font-medium">Estatus</th>

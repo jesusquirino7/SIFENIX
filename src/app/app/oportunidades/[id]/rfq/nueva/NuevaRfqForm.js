@@ -58,7 +58,7 @@ export default function NuevaRfqForm({ opportunityId, suppliers, initialItems })
 
     if (error) {
       setSaving(false);
-      showToast("No se pudo crear la RFQ: " + error.message, "error");
+      showToast("No se pudo crear la cotización a proveedor: " + error.message, "error");
       return;
     }
 
@@ -80,7 +80,7 @@ export default function NuevaRfqForm({ opportunityId, suppliers, initialItems })
       if (itemsError) {
         setSaving(false);
         showToast(
-          "La RFQ se creó, pero no se pudieron guardar los productos: " +
+          "La cotización a proveedor se creó, pero no se pudieron guardar los productos: " +
             itemsError.message,
           "error"
         );
@@ -90,7 +90,7 @@ export default function NuevaRfqForm({ opportunityId, suppliers, initialItems })
     }
 
     setSaving(false);
-    showToast("RFQ creada correctamente.");
+    showToast("Cotización a proveedor creada correctamente.");
     router.push(`/app/rfq-proveedores/${rfq.id}`);
   }
 
@@ -188,7 +188,7 @@ export default function NuevaRfqForm({ opportunityId, suppliers, initialItems })
           disabled={saving}
           className="rounded-md bg-[var(--brand-red)] px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
         >
-          {saving ? "Guardando…" : "Crear RFQ"}
+          {saving ? "Guardando…" : "Crear cotización"}
         </button>
       </div>
     </form>

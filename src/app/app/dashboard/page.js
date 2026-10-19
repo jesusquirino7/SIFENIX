@@ -118,7 +118,7 @@ export default async function DashboardPage() {
       href: `/app/rfq-proveedores/${r.id}`,
       title: r.rfq_number,
       subtitle: r.suppliers?.company_name,
-      badge: "RFQ sin respuesta",
+      badge: "Cotización a proveedor sin respuesta",
       badgeColor: "amber",
     })),
     ...(supplierOrdersOpen.data || [])
@@ -160,7 +160,7 @@ export default async function DashboardPage() {
           hint="Esperando respuesta del cliente"
         />
         <StatCard
-          label="RFQ enviadas"
+          label="Cotizaciones a proveedores enviadas"
           value={rfqsSentResult.count ?? 0}
           hint="Esperando respuesta del proveedor"
         />
@@ -184,7 +184,7 @@ export default async function DashboardPage() {
           {!attention.length ? (
             <EmptyState
               title="Todavía no hay nada pendiente de revisar"
-              description="Oportunidades trabadas, solicitudes nuevas del sitio, cotizaciones y RFQ enviadas esperando respuesta, y órdenes de proveedor atrasadas van a aparecer aquí."
+              description="Oportunidades trabadas, solicitudes nuevas del sitio, cotizaciones y cotizaciones a proveedores enviadas esperando respuesta, y órdenes de proveedor atrasadas van a aparecer aquí."
             />
           ) : (
             <div className="divide-y divide-neutral-100 rounded-lg border border-neutral-200 bg-white">

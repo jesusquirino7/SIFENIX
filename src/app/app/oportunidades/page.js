@@ -4,20 +4,42 @@ import PageHeader from "@/components/app/PageHeader";
 import EmptyState from "@/components/app/EmptyState";
 import Badge from "@/components/app/Badge";
 import { OPPORTUNITY_STATUS } from "@/components/app/statusColors";
+import { SALE_ENTITIES, saleEntityLabel } from "@/components/app/saleEntity";
 import { computeNextAction } from "./nextAction";
 
-export default async function OportunidadesPage() {
+export default async function OportunidadesPage({ searchParams }) {
+  const sp = await searchParams;
+  const ventaFiltro = sp?.venta || "";
+
   const supabase = await createClient();
-  const { data: opportunities } = await supabase
+  const { data: allOpportunities } = await supabase
     .from("opportunities")
     .select(
-      `id, opportunity_number, name, status, estimated_value, currency, customers(company_name),
+      `id, opportunity_number, name, status, estimated_value, currency, sale_entity, customers(company_name),
        quotations(id, status, created_at),
        rfqs(id, status),
        customer_orders(id, status),
        supplier_orders(id, status)`
     )
     .order("created_at", { ascending: false });
+
+  const counts = SALE_ENTITIES.reduce((acc, e) => {
+    acc[e.value] = (allOpportunities || []).filter(
+      (o) => o.sale_entity === e.value
+    ).length;
+    return acc;
+  }, {});
+
+  const opportunities = ventaFiltro
+    ? (allOpportunities || []).filter((o) => o.sale_entity === ventaFiltro)
+    : allOpportunities;
+
+  function pillHref(venta) {
+    const params = new URLSearchParams();
+    if (venta) params.set("venta", venta);
+    const qs = params.toString();
+    return qs ? `/app/oportunidades?${qs}` : "/app/oportunidades";
+  }
 
   return (
     <div>
@@ -37,6 +59,32 @@ export default async function OportunidadesPage() {
         operación — no hace falta entrar a cada una para saber qué sigue.
       </p>
 
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        <Link
+          href={pillHref("")}
+          className={`rounded-full border px-3 py-1.5 text-sm font-medium ${
+            !ventaFiltro
+              ? "border-[var(--brand-red)] bg-[var(--brand-red)]/10 text-[var(--brand-red)]"
+              : "border-neutral-300 text-neutral-600 hover:border-neutral-400"
+          }`}
+        >
+          Todos ({allOpportunities?.length || 0})
+        </Link>
+        {SALE_ENTITIES.map((e) => (
+          <Link
+            key={e.value}
+            href={pillHref(e.value)}
+            className={`rounded-full border px-3 py-1.5 text-sm font-medium ${
+              ventaFiltro === e.value
+                ? "border-[var(--brand-red)] bg-[var(--brand-red)]/10 text-[var(--brand-red)]"
+                : "border-neutral-300 text-neutral-600 hover:border-neutral-400"
+            }`}
+          >
+            {e.label} ({counts[e.value] || 0})
+          </Link>
+        ))}
+      </div>
+
       {!opportunities?.length ? (
         <EmptyState
           title="Todavía no hay oportunidades registradas"
@@ -49,6 +97,7 @@ export default async function OportunidadesPage() {
               <tr>
                 <th className="px-4 py-3 font-medium">Operación</th>
                 <th className="px-4 py-3 font-medium">Cliente</th>
+                <th className="px-4 py-3 font-medium">Venta</th>
                 <th className="px-4 py-3 font-medium">Estatus</th>
                 <th className="px-4 py-3 font-medium">Siguiente paso</th>
                 <th className="px-4 py-3 font-medium">Valor estimado</th>
@@ -86,6 +135,9 @@ export default async function OportunidadesPage() {
                     </td>
                     <td className="px-4 py-3 text-neutral-600">
                       {opportunity.customers?.company_name || "—"}
+                    </td>
+                    <td className="px-4 py-3 text-neutral-600">
+                      {saleEntityLabel(opportunity.sale_entity)}
                     </td>
                     <td className="px-4 py-3">
                       <Badge color={status.color}>{status.label}</Badge>

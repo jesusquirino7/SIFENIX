@@ -35,21 +35,21 @@ export default async function NuevaRfqPage({ params }) {
   return (
     <div>
       <PageHeader
-        title="Nueva RFQ"
+        title="Nueva cotización a proveedor"
         breadcrumbs={[
           { label: "Oportunidades", href: "/app/oportunidades" },
           {
             label: opportunity.opportunity_number,
             href: `/app/oportunidades/${opportunity.id}`,
           },
-          { label: "Nueva RFQ" },
+          { label: "Nueva cotización a proveedor" },
         ]}
       />
 
       {!suppliers?.length ? (
         <EmptyState
           title="Necesitas al menos un proveedor activo"
-          description="Da de alta un proveedor antes de enviar una RFQ."
+          description="Da de alta un proveedor antes de enviar una cotización a proveedor."
           action={
             <Link
               href="/app/proveedores"

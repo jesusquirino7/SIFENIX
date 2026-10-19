@@ -112,7 +112,7 @@ export function computeNextAction(opportunity) {
     const respondedRfq = rfqs.find((r) => r.status === "responded");
     if (respondedRfq) {
       return {
-        label: "RFQ respondida",
+        label: "Cotización a proveedor respondida",
         action: "Generar orden a proveedor",
         tone: "amber",
         href: `/app/rfq-proveedores/${respondedRfq.id}`,
@@ -120,7 +120,7 @@ export function computeNextAction(opportunity) {
     }
     const sentRfq = rfqs.find((r) => r.status === "sent");
     return {
-      label: "RFQ enviada",
+      label: "Cotización a proveedor enviada",
       action: "Esperando respuesta del proveedor",
       tone: "blue",
       href: sentRfq ? `/app/rfq-proveedores/${sentRfq.id}` : null,

@@ -30,7 +30,9 @@ export default async function OportunidadDetailPage({ params }) {
   ] = await Promise.all([
     supabase
       .from("opportunities")
-      .select("*, customers(id, company_name, email, phone)")
+      .select(
+        "*, customers(id, company_name, email, phone), creador:profiles!opportunities_created_by_fkey(full_name)"
+      )
       .eq("id", id)
       .maybeSingle(),
     supabase
@@ -134,72 +136,20 @@ export default async function OportunidadDetailPage({ params }) {
           <div>
             <div className="flex items-center justify-between">
               <h2 className="text-sm font-semibold text-neutral-500">
-                Cotizaciones
-              </h2>
-              <Link
-                href={`/app/oportunidades/${opportunity.id}/cotizaciones/nueva`}
-                className="text-sm font-medium text-[var(--brand-red)] hover:opacity-80"
-              >
-                + Nueva cotización
-              </Link>
-            </div>
-            <div className="mt-3">
-              {!quotations?.length ? (
-                <EmptyState
-                  title="Todavía no hay cotizaciones para esta operación"
-                  description="Da clic en 'Nueva cotización' para generar la primera a partir de los productos solicitados."
-                />
-              ) : (
-                <div className="divide-y divide-neutral-100 rounded-lg border border-neutral-200 bg-white">
-                  {quotations.map((quotation) => {
-                    const status =
-                      QUOTATION_STATUS[quotation.status] || QUOTATION_STATUS.draft;
-                    const total = (quotation.quotation_items || []).reduce(
-                      (sum, item) =>
-                        sum + (item.quantity || 0) * (item.unit_price || 0),
-                      0
-                    );
-                    return (
-                      <Link
-                        key={quotation.id}
-                        href={`/app/cotizaciones/${quotation.id}`}
-                        className="flex items-center justify-between px-4 py-3 text-sm hover:bg-neutral-50"
-                      >
-                        <span className="font-medium text-neutral-900">
-                          {quotation.quotation_number}
-                        </span>
-                        <span className="text-neutral-600">
-                          {total.toLocaleString("es-MX", {
-                            style: "currency",
-                            currency: quotation.currency,
-                          })}
-                        </span>
-                        <Badge color={status.color}>{status.label}</Badge>
-                      </Link>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-neutral-500">
-                RFQ a proveedores
+                Cotizaciones a Proveedores
               </h2>
               <Link
                 href={`/app/oportunidades/${opportunity.id}/rfq/nueva`}
                 className="text-sm font-medium text-[var(--brand-red)] hover:opacity-80"
               >
-                + Nueva RFQ
+                + Nueva cotización a proveedor
               </Link>
             </div>
             <div className="mt-3">
               {!rfqs?.length ? (
                 <EmptyState
-                  title="Todavía no hay RFQ para esta operación"
-                  description="Da clic en 'Nueva RFQ' para pedirle cotización a un proveedor a partir de los productos solicitados."
+                  title="Todavía no hay cotizaciones a proveedores para esta operación"
+                  description="Da clic en 'Nueva cotización a proveedor' para pedirle precio de referencia a un proveedor a partir de los productos solicitados."
                 />
               ) : (
                 <div className="divide-y divide-neutral-100 rounded-lg border border-neutral-200 bg-white">
@@ -244,7 +194,7 @@ export default async function OportunidadDetailPage({ params }) {
               {!rfqs?.length ? (
                 <EmptyState
                   title="Todavía no hay nada que comparar"
-                  description="Crea al menos una RFQ arriba para empezar a capturar respuestas de proveedores."
+                  description="Crea al menos una cotización a proveedor arriba para empezar a capturar respuestas."
                 />
               ) : (
                 <p className="text-sm text-neutral-500">
@@ -252,6 +202,58 @@ export default async function OportunidadDetailPage({ params }) {
                   proveedor{rfqs.length === 1 ? "" : "es"} consultado
                   {rfqs.length === 1 ? "" : "s"} para esta operación.
                 </p>
+              )}
+            </div>
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-neutral-500">
+                Cotizaciones a Clientes
+              </h2>
+              <Link
+                href={`/app/oportunidades/${opportunity.id}/cotizaciones/nueva`}
+                className="text-sm font-medium text-[var(--brand-red)] hover:opacity-80"
+              >
+                + Nueva cotización
+              </Link>
+            </div>
+            <div className="mt-3">
+              {!quotations?.length ? (
+                <EmptyState
+                  title="Todavía no hay cotizaciones para esta operación"
+                  description="Da clic en 'Nueva cotización' para generar la primera a partir de los productos solicitados."
+                />
+              ) : (
+                <div className="divide-y divide-neutral-100 rounded-lg border border-neutral-200 bg-white">
+                  {quotations.map((quotation) => {
+                    const status =
+                      QUOTATION_STATUS[quotation.status] || QUOTATION_STATUS.draft;
+                    const total = (quotation.quotation_items || []).reduce(
+                      (sum, item) =>
+                        sum + (item.quantity || 0) * (item.unit_price || 0),
+                      0
+                    );
+                    return (
+                      <Link
+                        key={quotation.id}
+                        href={`/app/cotizaciones/${quotation.id}`}
+                        className="flex items-center justify-between px-4 py-3 text-sm hover:bg-neutral-50"
+                      >
+                        <span className="font-medium text-neutral-900">
+                          {quotation.quotation_number}
+                        </span>
+                        <span className="text-neutral-600">
+                          {total.toLocaleString("es-MX", {
+                            style: "currency",
+                            currency: quotation.currency,
+                          })}
+                        </span>
+                        <Badge color={status.color}>{status.label}</Badge>
+                      </Link>
+                    );
+                  })}
+                </div>
               )}
             </div>
           </div>
@@ -398,29 +400,51 @@ export default async function OportunidadDetailPage({ params }) {
           </div>
         </div>
 
-        <div className="rounded-lg border border-neutral-200 bg-white p-6">
-          <h2 className="text-sm font-semibold text-neutral-500">Cliente</h2>
-          <p className="mt-2 font-medium text-neutral-900">
-            {opportunity.customers?.company_name}
-          </p>
-          {opportunity.customers?.email && (
-            <p className="mt-1 text-sm text-neutral-600">
-              {opportunity.customers.email}
+        <div className="space-y-6">
+          <div className="rounded-lg border border-neutral-200 bg-white p-6">
+            <h2 className="text-sm font-semibold text-neutral-500">Cliente</h2>
+            <p className="mt-2 font-medium text-neutral-900">
+              {opportunity.customers?.company_name}
             </p>
-          )}
-          {opportunity.customers?.phone && (
-            <p className="text-sm text-neutral-600">
-              {opportunity.customers.phone}
-            </p>
-          )}
-          {opportunity.customers?.id && (
-            <Link
-              href={`/app/clientes/${opportunity.customers.id}`}
-              className="mt-3 inline-block text-sm font-medium text-[var(--brand-red)] hover:opacity-80"
-            >
-              Ver cliente →
-            </Link>
-          )}
+            {opportunity.customers?.email && (
+              <p className="mt-1 text-sm text-neutral-600">
+                {opportunity.customers.email}
+              </p>
+            )}
+            {opportunity.customers?.phone && (
+              <p className="text-sm text-neutral-600">
+                {opportunity.customers.phone}
+              </p>
+            )}
+            {opportunity.customers?.id && (
+              <Link
+                href={`/app/clientes/${opportunity.customers.id}`}
+                className="mt-3 inline-block text-sm font-medium text-[var(--brand-red)] hover:opacity-80"
+              >
+                Ver cliente →
+              </Link>
+            )}
+          </div>
+
+          <div className="rounded-lg border border-neutral-200 bg-white p-6">
+            <h2 className="text-sm font-semibold text-neutral-500">
+              Registro
+            </h2>
+            <dl className="mt-2 space-y-2 text-sm">
+              <div>
+                <dt className="text-neutral-500">Registrada por</dt>
+                <dd className="font-medium text-neutral-900">
+                  {opportunity.creador?.full_name || "—"}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-neutral-500">Fecha de registro</dt>
+                <dd className="font-medium text-neutral-900">
+                  {new Date(opportunity.created_at).toLocaleDateString("es-MX")}
+                </dd>
+              </div>
+            </dl>
+          </div>
         </div>
       </div>
     </div>

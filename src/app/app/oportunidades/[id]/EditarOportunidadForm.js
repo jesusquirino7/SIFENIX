@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/components/app/ToastProvider";
 import { inputClass, labelClass } from "@/components/app/formStyles";
 import MoneyInput from "@/components/app/MoneyInput";
+import { SALE_ENTITIES, saleEntityLabel } from "@/components/app/saleEntity";
 
 export default function EditarOportunidadForm({ opportunity }) {
   const router = useRouter();
@@ -18,6 +19,7 @@ export default function EditarOportunidadForm({ opportunity }) {
     estimated_value: opportunity.estimated_value ?? "",
     currency: opportunity.currency || "MXN",
     expected_close_date: opportunity.expected_close_date || "",
+    sale_entity: opportunity.sale_entity || "sifenix",
   });
 
   function onChange(field, value) {
@@ -88,6 +90,12 @@ export default function EditarOportunidadForm({ opportunity }) {
               {opportunity.expected_close_date || "—"}
             </dd>
           </div>
+          <div>
+            <dt className="text-neutral-500">Venta</dt>
+            <dd className="font-medium text-neutral-900">
+              {saleEntityLabel(opportunity.sale_entity)}
+            </dd>
+          </div>
         </dl>
       </div>
     );
@@ -98,6 +106,22 @@ export default function EditarOportunidadForm({ opportunity }) {
       onSubmit={handleSubmit}
       className="space-y-4 rounded-lg border border-neutral-200 bg-white p-6"
     >
+      <div>
+        <label className={labelClass}>¿Quién realiza la venta? *</label>
+        <select
+          required
+          value={form.sale_entity}
+          onChange={(e) => onChange("sale_entity", e.target.value)}
+          className={inputClass}
+        >
+          {SALE_ENTITIES.map((entity) => (
+            <option key={entity.value} value={entity.value}>
+              {entity.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
       <div>
         <label className={labelClass}>Nombre de la operación *</label>
         <input

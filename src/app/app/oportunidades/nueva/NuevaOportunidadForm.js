@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/components/app/ToastProvider";
 import { inputClass, labelClass } from "@/components/app/formStyles";
 import MoneyInput from "@/components/app/MoneyInput";
+import { SALE_ENTITIES } from "@/components/app/saleEntity";
 
 const EMPTY_ITEM = { part_number: "", manufacturer: "", description: "", quantity: 1 };
 
@@ -20,6 +21,7 @@ export default function NuevaOportunidadForm({ customers }) {
     estimated_value: "",
     currency: "MXN",
     expected_close_date: "",
+    sale_entity: "sifenix",
   });
   const [items, setItems] = useState([{ ...EMPTY_ITEM }]);
 
@@ -56,6 +58,7 @@ export default function NuevaOportunidadForm({ customers }) {
           form.estimated_value === "" ? null : Number(form.estimated_value),
         currency: form.currency,
         expected_close_date: form.expected_close_date || null,
+        sale_entity: form.sale_entity,
       })
       .select("id")
       .single();
@@ -114,6 +117,22 @@ export default function NuevaOportunidadForm({ customers }) {
           {customers.map((customer) => (
             <option key={customer.id} value={customer.id}>
               {customer.company_name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <label className={labelClass}>¿Quién realiza la venta? *</label>
+        <select
+          required
+          value={form.sale_entity}
+          onChange={(e) => onChange("sale_entity", e.target.value)}
+          className={inputClass}
+        >
+          {SALE_ENTITIES.map((entity) => (
+            <option key={entity.value} value={entity.value}>
+              {entity.label}
             </option>
           ))}
         </select>

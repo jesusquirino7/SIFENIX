@@ -19,8 +19,8 @@ const NAV_GROUPS = [
     label: "Operación",
     items: [
       { href: "/app/oportunidades", label: "Oportunidades" },
-      { href: "/app/cotizaciones", label: "Cotizaciones" },
-      { href: "/app/rfq-proveedores", label: "RFQ Proveedores" },
+      { href: "/app/rfq-proveedores", label: "Cotizaciones a Proveedores" },
+      { href: "/app/cotizaciones", label: "Cotizaciones a Clientes" },
       { href: "/app/ordenes-cliente", label: "Órdenes de Cliente" },
       { href: "/app/ordenes-proveedor", label: "Órdenes a Proveedores" },
       { href: "/app/remisiones", label: "Remisiones" },

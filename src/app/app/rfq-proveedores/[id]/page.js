@@ -49,7 +49,7 @@ export default async function RfqDetailPage({ params }) {
       <PageHeader
         title={rfq.rfq_number}
         breadcrumbs={[
-          { label: "RFQ Proveedores", href: "/app/rfq-proveedores" },
+          { label: "Cotizaciones a Proveedores", href: "/app/rfq-proveedores" },
           { label: rfq.rfq_number },
         ]}
         action={<EstadoRfq rfqId={rfq.id} status={rfq.status} />}
